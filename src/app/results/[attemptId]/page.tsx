@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ResultPage({ params }: { params: { attemptId: string } }) {
   let attempt: AttemptResult | null = null;
-  const supabase = createClient();
+  const supabase = await createClient();
   if (supabase && !params.attemptId.startsWith("demo-")) {
     const { data } = await supabase
       .from("attempts")

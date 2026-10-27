@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, courseId, planId } = body;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   if (!supabase) return NextResponse.json({ error: "Supabase not configured" }, { status: 400 });
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   const result = scoreTest(test, answers ?? {}, timeUsedSec ?? 0);
 
-  const supabase = createClient();
+  const supabase = await createClient();
   if (supabase) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

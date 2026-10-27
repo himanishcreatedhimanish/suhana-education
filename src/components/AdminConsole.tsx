@@ -52,7 +52,7 @@ export default function AdminConsole({ role }: { role: "teacher" | "admin" }) {
     } else {
       const list = store.getCourses();
       if (id) { const i = list.findIndex((x) => x.id === id); if (i > -1) list[i] = { ...list[i], ...c } as Course; }
-      else list.unshift({ id: "c" + Date.now(), chapters: [], ...(c as Course) });
+      else list.unshift({ ...(c as Course), id: "c" + Date.now(), chapters: [] });
       store.saveCourses(list);
     }
     setModal(null); toast(id ? "Course updated" : "Course created"); load();
@@ -71,7 +71,7 @@ export default function AdminConsole({ role }: { role: "teacher" | "admin" }) {
     } else {
       const list = store.getTests();
       if (id) { const i = list.findIndex((x) => x.id === id); if (i > -1) list[i] = { ...list[i], ...t } as Test; }
-      else list.unshift({ id: "t" + Date.now(), questions: [], ...(t as Test) });
+      else list.unshift({ ...(t as Test), id: "t" + Date.now(), questions: [] });
       store.saveTests(list);
     }
     setModal(null); toast(id ? "Test updated" : "Test created"); load();

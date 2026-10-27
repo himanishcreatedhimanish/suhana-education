@@ -13,7 +13,7 @@ export default async function CoursePage({ params }: { params: { id: string } })
   let enrolled = false;
   let progress: string[] = [];
 
-  const supabase = createClient();
+  const supabase = await createClient();
   if (supabase) {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {

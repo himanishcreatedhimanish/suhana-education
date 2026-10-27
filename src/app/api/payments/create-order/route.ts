@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { courseId, planId } = body;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   if (!supabase) return NextResponse.json({ error: "Payments require Supabase to be configured." }, { status: 400 });
 
   const { data: { user } } = await supabase.auth.getUser();

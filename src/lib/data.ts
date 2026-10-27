@@ -6,7 +6,7 @@ import type { Course, Test, Profile } from "@/lib/types";
 // demo seed data so the whole site is browsable without a backend.
 
 export async function getCourses(): Promise<Course[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   if (!supabase) return demoCourses;
   const { data: courses } = await supabase
     .from("courses")
@@ -20,7 +20,7 @@ export async function getCourses(): Promise<Course[]> {
 }
 
 export async function getCourse(id: string): Promise<Course | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   if (!supabase) return demoCourse(id);
   const { data: course } = await supabase
     .from("courses")
@@ -43,7 +43,7 @@ export async function getCourse(id: string): Promise<Course | null> {
 }
 
 export async function getTests(): Promise<Test[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   if (!supabase) return demoTests.map((t) => ({ ...t, questions: [] }));
   const { data } = await supabase
     .from("tests")
@@ -54,7 +54,7 @@ export async function getTests(): Promise<Test[]> {
 
 // Full test WITH answers — server only, never send directly to the client.
 export async function getTestWithAnswers(id: string): Promise<Test | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   if (!supabase) return demoTest(id);
   const { data: test } = await supabase
     .from("tests")
@@ -71,7 +71,7 @@ export async function getTestWithAnswers(id: string): Promise<Test | null> {
 }
 
 export async function getProfile(): Promise<Profile | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   if (!supabase) return null; // demo mode handled client-side
   const {
     data: { user },
