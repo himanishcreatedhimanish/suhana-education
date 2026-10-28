@@ -4,6 +4,7 @@ import { SUPABASE_CONFIGURED } from "@/lib/env";
 import { CheckIcon } from "@/components/icons";
 import { PLANS, priceBreakdown } from "@/lib/plans";
 import HeroVisual from "@/components/HeroVisual";
+import AuthCta from "@/components/AuthCta";
 
 export default async function HomePage() {
   const steps = [
@@ -64,7 +65,7 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-          <div style={{ textAlign: "center", marginTop: 34 }}><Link className="btn" href="/login">Create your free account</Link></div>
+          <div style={{ textAlign: "center", marginTop: 34 }}><AuthCta className="btn" loggedOutLabel="Create your free account" loggedInLabel="Go to my dashboard" /></div>
         </div>
       </section>
 
@@ -115,8 +116,8 @@ export default async function HomePage() {
             <h2 style={{ fontSize: "clamp(1.6rem,4vw,2.4rem)" }}>Ready to start preparing?</h2>
             <p className="mut" style={{ margin: "12px 0 22px" }}>Create a free account, pick your class and exam, and begin with live or recorded lessons.</p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <Link className="btn" href="/login">Create free account</Link>
-              <Link className="btn ghost" href="/courses">Browse courses</Link>
+              <AuthCta className="btn" loggedOutLabel="Create free account" loggedInLabel="Go to my dashboard" />
+              <Link className="btn ghost" href="/courses">Browse plans</Link>
             </div>
           </div>
         </div>

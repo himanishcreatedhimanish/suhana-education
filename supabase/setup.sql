@@ -276,6 +276,7 @@ create index if not exists idx_notif_user on notifications(user_id);
 
 -- Allow orders to reference a plan instead of a single course.
 alter table orders add column if not exists plan_id text;
+alter table orders add column if not exists class int;
 alter table orders alter column course_id drop not null;
 
 create table if not exists subscriptions (

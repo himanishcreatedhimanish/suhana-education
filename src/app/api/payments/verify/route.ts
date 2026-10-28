@@ -20,6 +20,11 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
   if (!admin) return NextResponse.json({ ok: false, error: "Server key missing" }, { status: 500 });
 
+  // Idempotency: if the webhook already marked this order paid and granted
+  // access, don't grant a second time.
+  const { data: existingOrder } = await admin.from("orders").select("status").eq("razorpay_order_id", razorpay_order_id).maybeSingle();
+  if (existingOrder?.status === "paid") return NextResponse.json({ ok: true, already: true });
+
   await admin.from("orders").update({ status: "paid", razorpay_payment_id }).eq("razorpay_order_id", razorpay_order_id);
 
   if (planId) {

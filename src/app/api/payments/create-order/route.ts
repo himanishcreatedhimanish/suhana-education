@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
       user_id: user.id,
       course_id: planId ? null : courseId,
       plan_id: planId ?? null,
+      class: planId ? (Number(body.class) || 9) : null,
       amount,
       razorpay_order_id: order.id,
       status: "created",

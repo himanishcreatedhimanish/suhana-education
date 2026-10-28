@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { setDemoUser } from "@/lib/clientState";
@@ -30,6 +30,13 @@ export default function LoginForm() {
     router.push(p?.onboarded ? next : "/onboarding");
     router.refresh();
   }
+
+  // Already logged in? Don't show sign-up — send them to their dashboard.
+  useEffect(() => {
+    if (!SUPABASE_CONFIGURED) return;
+    supabase?.auth.getUser().then(({ data }) => { if (data.user) router.replace(next || "/dashboard"); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function sendOtp() {
     const digits = phone.replace(/\D/g, "");
