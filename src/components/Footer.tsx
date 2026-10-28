@@ -7,11 +7,7 @@ export default function Footer() {
         <div className="fcols">
           <div className="fbrand">
             <span className="brand">
-              <svg className="logo" viewBox="0 0 40 40" fill="none" aria-hidden>
-                <rect width="40" height="40" rx="11" fill="var(--primary)" />
-                <path d="M20 9l9 5v7c0 5.5-4 9.5-9 11-5-1.5-9-5.5-9-11v-7l9-5Z" fill="#fff" />
-                <path d="M15.5 20.2l3.4 3.3 6-6.4" stroke="var(--primary)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              </svg>
+              <img src="/suhana-icon.png" alt="" className="brand-logo-icon" />
               <span style={{ color: "var(--on-navy)" }}>Suhana<small>Education</small></span>
             </span>
             <p>Live classes, recorded lectures and test series for the J&amp;K State Board (JKBOSE) — Classes 8 to 10.</p>

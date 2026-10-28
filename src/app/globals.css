@@ -99,6 +99,8 @@ img{max-width:100%}
 .nav-in{display:flex;align-items:center;gap:18px;height:80px}
 .brand{display:flex;align-items:center;gap:11px;font-family:"Plus Jakarta Sans",sans-serif;font-weight:700;font-size:1.18rem;letter-spacing:-.02em}
 .brand .logo{width:38px;height:38px;flex:none}
+.brand-logo{height:40px;width:auto;display:block}
+.brand-logo-icon{height:36px;width:auto;display:block;flex:none;border-radius:9px}
 .brand small{display:block;font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:-1px}
 .nav-links{display:flex;gap:4px;margin-left:16px;font-weight:500;font-size:.9rem;color:var(--muted)}
 .nav-links a{position:relative;padding:8px 12px;border-radius:9px;transition:color .18s ease,background .18s ease}
@@ -579,3 +581,5 @@ footer{background:var(--navy);color:var(--on-navy);padding-block:clamp(44px,6vw,
     @keyframes revealIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
   }
 }
+
+@media (max-width:640px){.brand-logo{height:34px}.brand-logo-icon{height:32px}}

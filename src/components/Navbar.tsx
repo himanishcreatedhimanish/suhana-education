@@ -46,20 +46,12 @@ export default function Navbar() {
     router.refresh();
   }
 
-  const Logo = (
-    <svg className="logo" viewBox="0 0 40 40" fill="none" aria-hidden>
-      <rect width="40" height="40" rx="11" fill="var(--primary)" />
-      <path d="M20 9l9 5v7c0 5.5-4 9.5-9 11-5-1.5-9-5.5-9-11v-7l9-5Z" fill="#fff" />
-      <path d="M15.5 20.2l3.4 3.3 6-6.4" stroke="var(--primary)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </svg>
-  );
 
   return (
     <header className="nav">
       <div className="wrap nav-in">
-        <Link className="brand" href="/">
-          {Logo}
-          <span>Suhana<small>Education</small></span>
+        <Link className="brand" href="/" aria-label="Suhana Education home">
+          <img src="/suhana-logo.png" alt="Suhana Education" className="brand-logo" />
         </Link>
         <nav className="nav-links" aria-label="Primary">
           {LINKS.map(([href, label]) => (
