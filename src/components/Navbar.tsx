@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getDemoUser, setDemoUser } from "@/lib/clientState";
+import { SunIcon, MoonIcon } from "@/components/icons";
 
 const LINKS = [
   ["/courses", "Courses"],
@@ -17,9 +18,15 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [dark, setDark] = useState(false);
   const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem("suhana-theme");
+      if (stored) document.documentElement.setAttribute("data-theme", stored);
+      setDark(stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches));
+    } catch {}
     const supabase = createClient();
     if (supabase) {
       supabase.auth.getUser().then(({ data }) => {
@@ -47,6 +54,15 @@ export default function Navbar() {
   }
 
 
+  function toggleTheme() {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const isDark = cur === "dark" || (!cur && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const next = isDark ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("suhana-theme", next); } catch {}
+    setDark(!isDark);
+  }
+
   return (
     <header className="nav">
       <div className="wrap nav-in">
@@ -61,6 +77,9 @@ export default function Navbar() {
           ))}
         </nav>
         <div className="nav-right">
+          <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle dark mode">
+            {dark ? <SunIcon size={18} /> : <MoonIcon size={18} />}
+          </button>
           {name ? (
             <>
               <Link className="userchip" href="/dashboard">
