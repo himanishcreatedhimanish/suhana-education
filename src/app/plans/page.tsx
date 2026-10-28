@@ -9,7 +9,9 @@ export const metadata = {
   description: "Base, Rise and Elite plans with complete learning support for Class 8, 9 & 10.",
 };
 
-export default function PlansPage() {
+export default function PlansPage({ searchParams }: { searchParams: { class?: string } }) {
+  const c = Number(searchParams.class);
+  const initialClass = [8, 9, 10].includes(c) ? c : 9;
   return (
     <div className="wrap page">
       <div className="sec-head" style={{ marginTop: 10 }}>
@@ -18,7 +20,7 @@ export default function PlansPage() {
         <p>Pick the plan that fits you. Every plan covers live classes, study material, doubt-solving and fortnightly online exams — with health and career support on higher tiers.</p>
       </div>
 
-      <PlanCards />
+      <PlanCards initialClass={initialClass} />
 
       <div className="card" style={{ marginTop: 40, maxWidth: 820, margin: "40px auto 0" }}>
         <h3 style={{ marginBottom: 10 }}>What’s included</h3>

@@ -118,7 +118,7 @@ export default function HeroVisual() {
         <div className="hv-bar"><i style={{ width: cur.pct + "%" }} /></div>
         <div className="hv-foot">
           <span className="hv-pct">{cur.pct}% complete</span>
-          <Link href={`/courses?subject=${encodeURIComponent(cur.name)}`} className="hv-link">Start learning →</Link>
+          <Link href="/courses" className="hv-link">Start learning →</Link>
         </div>
       </div>
     </div>

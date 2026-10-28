@@ -411,7 +411,15 @@ footer{background:var(--navy);color:var(--on-navy);padding-block:clamp(38px,6vw,
 }
 
 /* ===== plans / pricing ===== */
-.cls-switch{display:flex;flex-direction:column;align-items:center;gap:12px;margin:0 auto 30px}
+/* enrollment step indicator */
+.enroll-steps{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;list-style:none;margin:0 auto 26px;padding:0;max-width:680px}
+.enroll-steps .es{display:flex;align-items:center;gap:9px;font-size:.86rem;font-weight:600;color:var(--muted);background:var(--glass-2);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid var(--glass-brd);border-radius:999px;padding:8px 16px 8px 8px;transition:all .25s ease}
+.enroll-steps .es span{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--line);color:var(--muted);font-weight:800;font-size:.8rem;flex:none}
+.enroll-steps .es.on{color:var(--ink);border-color:color-mix(in srgb,var(--primary) 40%,transparent)}
+.enroll-steps .es.on span{background:linear-gradient(135deg,var(--primary),var(--primary-d));color:var(--on-primary)}
+.step2-head{text-align:center;color:var(--muted);font-size:.95rem;margin:0 auto 22px}
+.step2-head b{color:var(--ink)}
+.cls-switch{display:flex;flex-direction:column;align-items:center;gap:12px;margin:0 auto 22px}
 .cls-switch-label{font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .cls-switch-pick{display:inline-flex;gap:6px;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:5px}
 .cls-switch-pill{font:inherit;font-weight:700;font-size:.9rem;border:0;background:0;color:var(--muted);padding:9px 22px;border-radius:999px;cursor:pointer;transition:background .18s,color .18s,transform .08s}

@@ -17,8 +17,8 @@ function Cross({ size = 17 }: { size?: number }) {
   );
 }
 
-export default function PlanCards() {
-  const [cls, setCls] = useState<number>(9);
+export default function PlanCards({ initialClass = 9 }: { initialClass?: number }) {
+  const [cls, setCls] = useState<number>(initialClass);
   const [busy, setBusy] = useState<string | null>(null);
 
   function loadRazorpay(): Promise<void> {
@@ -86,14 +86,23 @@ export default function PlanCards() {
 
   return (
     <>
+      <ol className="enroll-steps" aria-label="Enrollment steps">
+        <li className="es on"><span>1</span>Select your class</li>
+        <li className="es on"><span>2</span>Compare plans</li>
+        <li className="es"><span>3</span>Enroll &amp; pay</li>
+      </ol>
+
       <div className="cls-switch">
-        <span className="cls-switch-label">Choose your class</span>
+        <span className="cls-switch-label">Step 1 — Choose your class</span>
         <div className="cls-switch-pick">
           {PLAN_CLASSES.map((c) => (
             <button key={c} className={"cls-switch-pill" + (cls === c ? " on" : "")} onClick={() => setCls(c)}>Class {c}</button>
           ))}
         </div>
       </div>
+
+      <p className="step2-head">Step 2 — Compare Base, Rise &amp; Elite for <b>Class {cls}</b></p>
+
       <div className="plans">
         {PLANS.map((plan) => {
           const { price, gst, total } = priceBreakdown(plan.price);
@@ -119,7 +128,7 @@ export default function PlanCards() {
               </ul>
 
               <button className={"btn block" + (plan.popular ? "" : " ghost")} disabled={busy === plan.id} onClick={() => choose(plan)} style={plan.popular ? { background: plan.accent, color: "#fff" } : undefined}>
-                {busy === plan.id ? "Please wait…" : `Choose ${plan.name.replace(" Plan", "")}`}
+                {busy === plan.id ? "Please wait…" : "Enroll Now"}
               </button>
             </div>
           );
