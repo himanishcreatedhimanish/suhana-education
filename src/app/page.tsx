@@ -1,15 +1,16 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { getCourses } from "@/lib/data";
 import { SUPABASE_CONFIGURED } from "@/lib/env";
-import CourseCard from "@/components/CourseCard";
 import { CheckIcon } from "@/components/icons";
 import { PLANS, priceBreakdown } from "@/lib/plans";
 import HeroVisual from "@/components/HeroVisual";
 
 export default async function HomePage() {
-  const courses = await getCourses();
-  const popular = courses.slice(0, 3);
+  const steps = [
+    { t: "Create your free account", d: "Sign up with your phone, email or Google in under a minute — no card needed.", c: "#4338ca", c2: "#6d28d9", icon: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></> },
+    { t: "Pick your class & subjects", d: "Choose Class 8, 9 or 10 and your JKBOSE subjects — Mathematics, Science, Social Science and English.", c: "#ef8a1f", c2: "#d2691e", icon: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" /></> },
+    { t: "Learn, practise & track", d: "Join live classes, watch recordings, attempt tests, and follow your progress on your dashboard.", c: "#15935a", c2: "#0e7a4a", icon: <><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></> },
+  ];
 
   const feats = [
     ["Live classes", "Interactive live sessions with teachers, plus weekly doubt-solving."],
@@ -50,9 +51,20 @@ export default async function HomePage() {
 
       <section className="sec sec-soft">
         <div className="wrap">
-          <div className="sec-head"><span className="eyebrow">Popular courses</span><h2>Start with a top batch.</h2></div>
-          <div className="grid">{popular.map((c) => <CourseCard key={c.id} course={c} />)}</div>
-          <div style={{ textAlign: "center", marginTop: 28 }}><Link className="btn ghost" href="/courses">View all courses</Link></div>
+          <div className="sec-head"><span className="eyebrow">How it works</span><h2>Start learning in three simple steps.</h2><p>From sign-up to your first lesson in minutes — no complicated setup.</p></div>
+          <div className="steps">
+            {steps.map((s, i) => (
+              <div key={s.t} className="step">
+                <span className="step-n">{i + 1}</span>
+                <div className="step-ic" style={{ background: `linear-gradient(135deg, ${s.c}, ${s.c2})` }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={24} height={24}>{s.icon}</svg>
+                </div>
+                <h3>{s.t}</h3>
+                <p>{s.d}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ textAlign: "center", marginTop: 34 }}><Link className="btn" href="/login">Create your free account</Link></div>
         </div>
       </section>
 
