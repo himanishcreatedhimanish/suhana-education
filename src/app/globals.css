@@ -245,7 +245,33 @@ tr:last-child td{border-bottom:0}
 .list-row .ic{width:38px;height:38px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;flex:none}
 .list-row .ic svg{width:17px;height:17px}
 .progress{height:7px;border-radius:999px;background:var(--soft);overflow:hidden;min-width:90px;flex:1}
-.progress i{display:block;height:100%;background:var(--primary);border-radius:999px}
+.progress i{display:block;height:100%;background:var(--primary);border-radius:999px;transition:width .5s ease}
+
+/* premium dashboard sidebar */
+.dash.collapsed{grid-template-columns:66px 1fr}
+.ds-side{gap:2px}
+.ds-main{min-width:0}
+.ds-collapse{display:flex;align-items:center;gap:9px;font:inherit;font-size:.82rem;font-weight:600;color:var(--muted);background:0;border:0;border-radius:10px;padding:9px 13px;cursor:pointer;margin-bottom:4px}
+.ds-collapse:hover{color:var(--ink);background:var(--soft)}
+.dash.collapsed .ds-collapse{justify-content:center;padding:9px 0}
+.ds-group{display:flex;flex-direction:column;gap:3px;margin-bottom:4px}
+.ds-group-h{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:10px 13px 5px}
+.ds-label{white-space:nowrap}
+.ds-soon-dot{margin-left:auto;font-size:.58rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent);padding:2px 6px;border-radius:5px}
+.dash.collapsed .dnav button{justify-content:center;padding:11px 0}
+.ds-plan{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:var(--primary-soft);border:none}
+.ds-soon{position:relative}
+.ds-soon-badge{display:inline-flex;align-items:center;font-size:.68rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--primary);background:var(--primary-soft);padding:5px 12px;border-radius:999px}
+.ds-profile{display:flex;flex-direction:column}
+.ds-profile .kv{padding:11px 0}
+@media (max-width:980px){
+  .dash.collapsed{grid-template-columns:1fr}
+  .ds-side{flex-direction:row;flex-wrap:nowrap}
+  .ds-collapse{display:none}
+  .ds-group{flex-direction:row;margin-bottom:0}
+  .ds-group-h{display:none}
+  .ds-soon-dot{display:none}
+}
 
 /* exam */
 .exam{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}

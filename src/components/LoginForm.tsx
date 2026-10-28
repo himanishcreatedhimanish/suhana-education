@@ -21,6 +21,16 @@ export default function LoginForm() {
 
   const supabase = createClient();
 
+  // Returning (already-onboarded) students go straight to the dashboard;
+  // new accounts go through onboarding first.
+  async function routeAfterLogin() {
+    const { data: { user } } = await supabase!.auth.getUser();
+    if (!user) return router.push("/login");
+    const { data: p } = await supabase!.from("profiles").select("onboarded").eq("id", user.id).maybeSingle();
+    router.push(p?.onboarded ? next : "/onboarding");
+    router.refresh();
+  }
+
   async function sendOtp() {
     const digits = phone.replace(/\D/g, "");
     if (digits.length !== 10) return toast("Enter a valid 10-digit number");
@@ -47,8 +57,7 @@ export default function LoginForm() {
     const { error } = await supabase!.auth.verifyOtp({ phone: "+91" + phone.replace(/\D/g, ""), token: otp, type: "sms" });
     setBusy(false);
     if (error) return toast(error.message);
-    router.push("/onboarding");
-    router.refresh();
+    return routeAfterLogin();
   }
 
   async function emailSignIn() {
@@ -68,8 +77,7 @@ export default function LoginForm() {
     }
     setBusy(false);
     if (error) return toast(error.message);
-    router.push("/onboarding");
-    router.refresh();
+    return routeAfterLogin();
   }
 
   async function google() {
