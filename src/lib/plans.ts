@@ -71,8 +71,10 @@ export const PLANS: Plan[] = [
     features: [
       "Live Lectures",
       "Recorded Lectures",
+      "Soft Copy of Study Material",
       "Hard Copy of Study Material",
       "DPPs (Daily Practice Problems)",
+      "Assignments",
       "Online Doubt Solving",
       "Fortnightly Online Exams",
       "Health Gennie (health consultations)",
