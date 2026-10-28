@@ -110,10 +110,10 @@ export default function Navbar() {
         </div>
       </div>
       {open && (
-        <div style={{ borderTop: "1px solid var(--line)", background: "var(--surface)" }}>
+        <div style={{ borderTop: "1px solid var(--line)", background: "var(--surface)", animation: "slideInDown .2s ease-out" }}>
           <div className="wrap" style={{ display: "flex", flexDirection: "column", gap: 2, paddingBlock: 12 }}>
-            {LINKS.map(([href, label]) => (
-              <Link key={href} href={href} onClick={() => setOpen(false)} style={{ padding: "10px 4px", fontWeight: 600, color: "var(--muted)" }}>
+            {LINKS.map(([href, label], i) => (
+              <Link key={href} href={href} onClick={() => setOpen(false)} style={{ padding: "12px 8px", fontWeight: 600, color: "var(--muted)", borderRadius: "8px", transition: "all .2s", cursor: "pointer", animation: `fadeInUp .3s ease-out ${i * 50}ms backwards` }} onMouseEnter={(e) => e.currentTarget.style.background = "var(--soft)"} onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                 {label}
               </Link>
             ))}

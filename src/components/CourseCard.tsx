@@ -11,7 +11,7 @@ export default function CourseCard({ course }: { course: Course }) {
   const lectureCount = (course.chapters ?? []).reduce((s, c) => s + c.lectures.length, 0);
   const gid = "th-" + course.id;
   return (
-    <Link className="pcard" href={`/courses/${course.id}`}>
+    <Link className="pcard" href={`/courses/${course.id}`} style={{textDecoration: 'none'}}>
       <div className="pthumb">
         <svg className="bg" viewBox="0 0 320 120" preserveAspectRatio="xMidYMid slice" aria-hidden>
           <defs>
@@ -35,29 +35,31 @@ export default function CourseCard({ course }: { course: Course }) {
           <span className="t">{course.exam}</span>
           <span className="t">{course.subject}</span>
         </div>
-        <h3>{course.title}</h3>
-        <p className="desc">
+        <h3 style={{fontSize: '1.1rem', fontWeight: 700, lineHeight: 1.25, marginBottom: 8}}>
+          {course.title}
+        </h3>
+        <p className="desc" style={{fontSize: '.88rem', color: 'var(--muted)', marginBottom: 12}}>
           {(course.description ?? "").slice(0, 96)}
           {(course.description ?? "").length > 96 ? "…" : ""}
         </p>
-        <div className="pmeta">
+        <div className="pmeta" style={{fontSize: '.82rem', gap: 14, marginBottom: 14}}>
           {lectureCount > 0 && (
-            <span className="d"><BookIcon size={14} />{lectureCount} lectures</span>
+            <span className="d" style={{display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)'}}><BookIcon size={14} />{lectureCount} lectures</span>
           )}
-          <span className="d"><ClockIcon size={14} />{course.teacher_name}</span>
+          <span className="d" style={{display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)'}}><ClockIcon size={14} />{course.teacher_name}</span>
         </div>
         <div className="pfoot">
           <div className="price">
             {course.price > 0 ? (
               <>
-                <b>{rupee(course.price)}</b>
-                {course.mrp > course.price && <s>{rupee(course.mrp)}</s>}
+                <b style={{fontSize: '1.3rem', color: 'var(--primary)'}}>{rupee(course.price)}</b>
+                {course.mrp > course.price && <s style={{color: 'var(--muted)', fontSize: '.85rem'}}>{rupee(course.mrp)}</s>}
               </>
             ) : (
-              <span className="free">Free</span>
+              <span className="free" style={{fontWeight: 700}}>Free</span>
             )}
           </div>
-          <span className="btn sm">View</span>
+          <span className="btn sm" style={{background: 'var(--primary)', color: '#fff'}}>View</span>
         </div>
       </div>
     </Link>
