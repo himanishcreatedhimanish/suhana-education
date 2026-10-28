@@ -8,9 +8,9 @@ import AuthCta from "@/components/AuthCta";
 
 export default async function HomePage() {
   const steps = [
-    { t: "Create your free account", d: "Sign up with your phone, email or Google in under a minute — no card needed.", c: "#4338ca", c2: "#6d28d9", icon: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></> },
-    { t: "Pick your class & subjects", d: "Choose Class 8, 9 or 10 and your JKBOSE subjects — Mathematics, Science, Social Science and English.", c: "#ef8a1f", c2: "#d2691e", icon: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" /></> },
-    { t: "Learn, practise & track", d: "Join live classes, watch recordings, attempt tests, and follow your progress on your dashboard.", c: "#15935a", c2: "#0e7a4a", icon: <><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></> },
+    { t: "Create your free account", d: "Sign up with your phone, email or Google in under a minute — no card needed.", c: "#2563eb", c2: "#1d4ed8", icon: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6M22 11h-6" /></> },
+    { t: "Pick your class & subjects", d: "Choose Class 8, 9 or 10 and your JKBOSE subjects — Mathematics, Science, Social Science and English.", c: "#f59e0b", c2: "#d97706", icon: <><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" /></> },
+    { t: "Learn, practise & track", d: "Join live classes, watch recordings, attempt tests, and follow your progress on your dashboard.", c: "#0ea371", c2: "#059669", icon: <><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></> },
   ];
 
   const feats = [
@@ -20,6 +20,12 @@ export default async function HomePage() {
     ["Progress tracking", "Lecture completion and test performance on your dashboard."],
     ["Expert teachers", "Learn from experienced J&K State Board (JKBOSE) faculty."],
     ["Structured by syllabus", "Organised by class, exam, subject, chapter and lecture."],
+  ];
+
+  const trust = [
+    "Bilingual teaching — English + Urdu / Kashmiri",
+    "100% JKBOSE 2026 blueprint",
+    "Live + recorded, with doubt-solving",
   ];
 
   return (
@@ -43,6 +49,11 @@ export default async function HomePage() {
               <Link className="btn" href="/courses">Explore courses</Link>
               <Link className="btn ghost" href="/tests">Try a mock test</Link>
             </div>
+            <div className="chips">
+              {trust.map((t) => (
+                <span key={t} className="c"><CheckIcon size={17} />{t}</span>
+              ))}
+            </div>
           </div>
           <div className="visual">
             <HeroVisual />
@@ -65,7 +76,7 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-          <div style={{ textAlign: "center", marginTop: 34 }}><AuthCta className="btn" loggedOutLabel="Create your free account" loggedInLabel="Go to my dashboard" /></div>
+          <div style={{ textAlign: "center", marginTop: 38 }}><AuthCta className="btn" loggedOutLabel="Create your free account" loggedInLabel="Go to my dashboard" /></div>
         </div>
       </section>
 
@@ -112,12 +123,16 @@ export default async function HomePage() {
 
       <section className="sec">
         <div className="wrap">
-          <div className="card" style={{ textAlign: "center", maxWidth: 720, margin: "0 auto" }}>
-            <h2 style={{ fontSize: "clamp(1.6rem,4vw,2.4rem)" }}>Ready to start preparing?</h2>
-            <p className="mut" style={{ margin: "12px 0 22px" }}>Create a free account, pick your class and exam, and begin with live or recorded lessons.</p>
-            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <AuthCta className="btn" loggedOutLabel="Create free account" loggedInLabel="Go to my dashboard" />
-              <Link className="btn ghost" href="/courses">Browse plans</Link>
+          <div style={{ background: "var(--primary)", color: "#fff", borderRadius: 20, padding: "clamp(28px,5vw,52px)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 24, boxShadow: "var(--shadow-lg)", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", right: -80, bottom: -80, width: 320, height: 320, borderRadius: "50%", background: "rgba(255,255,255,.08)", pointerEvents: "none" }} />
+            <div style={{ maxWidth: 560, position: "relative", zIndex: 1 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.14)", borderRadius: 999, padding: "5px 13px", fontSize: ".78rem", fontWeight: 600, marginBottom: 14 }}>Admissions open · Academic Year 2026–27</span>
+              <h2 style={{ fontSize: "clamp(1.7rem,4vw,2.5rem)", color: "#fff", lineHeight: 1.1 }}>Ready to start preparing?</h2>
+              <p style={{ margin: "14px 0 0", color: "rgba(255,255,255,.9)", fontSize: "1.05rem", lineHeight: 1.6, maxWidth: "48ch" }}>Create a free account, pick your class and board exam, and begin with live or recorded lessons today.</p>
+            </div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", position: "relative", zIndex: 1 }}>
+              <AuthCta className="btn light" loggedOutLabel="Create free account" loggedInLabel="Go to my dashboard" />
+              <Link className="btn" href="/courses" style={{ background: "rgba(255,255,255,.14)", color: "#fff", boxShadow: "none" }}>Browse courses</Link>
             </div>
           </div>
         </div>

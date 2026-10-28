@@ -4,11 +4,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getDemoUser, setDemoUser } from "@/lib/clientState";
-import { SunIcon, MoonIcon } from "@/components/icons";
 
 const LINKS = [
-  ["/plans", "Plans"],
   ["/courses", "Courses"],
+  ["/plans", "Plans"],
   ["/tests", "Test Series"],
   ["/dashboard", "Dashboard"],
   ["/about", "About"],
@@ -17,21 +16,10 @@ const LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [dark, setDark] = useState(false);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
-    // theme
-    try {
-      const stored = localStorage.getItem("suhana-theme");
-      if (stored) document.documentElement.setAttribute("data-theme", stored);
-      setDark(
-        stored === "dark" ||
-          (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches)
-      );
-    } catch {}
-    // auth state
     const supabase = createClient();
     if (supabase) {
       supabase.auth.getUser().then(({ data }) => {
@@ -48,15 +36,6 @@ export default function Navbar() {
       setName(u?.full_name || null);
     }
   }, [pathname]);
-
-  function toggleTheme() {
-    const cur = document.documentElement.getAttribute("data-theme");
-    const isDark = cur === "dark" || (!cur && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    const next = isDark ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    try { localStorage.setItem("suhana-theme", next); } catch {}
-    setDark(!isDark);
-  }
 
   async function logout() {
     const supabase = createClient();
@@ -90,9 +69,6 @@ export default function Navbar() {
           ))}
         </nav>
         <div className="nav-right">
-          <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme">
-            {dark ? <SunIcon size={18} /> : <MoonIcon size={18} />}
-          </button>
           {name ? (
             <>
               <Link className="userchip" href="/dashboard">
@@ -102,7 +78,7 @@ export default function Navbar() {
               <button className="btn sm ghost" onClick={logout}>Log out</button>
             </>
           ) : (
-            <Link className="btn sm" href="/login">Log in / Sign up</Link>
+            <Link className="btn sm" href="/login">Student Portal</Link>
           )}
           <button className="icon-btn burger" onClick={() => setOpen(!open)} aria-label="Menu" aria-expanded={open}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" width={18} height={18}><path d="M4 7h16M4 12h16M4 17h16" /></svg>
