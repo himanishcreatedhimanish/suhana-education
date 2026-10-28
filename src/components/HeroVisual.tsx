@@ -104,10 +104,6 @@ export default function HeroVisual() {
         </div>
       </div>
 
-      {/* badges */}
-      <div className="glass gc-badge"><div className="big">8–10</div><div className="lbl">Classes<br />covered</div></div>
-      <div className="glass gc-live"><i />Live class now</div>
-
       {/* live progress card (focused subject) */}
       <div className="glass hv-card">
         <div className="hv-card-top">

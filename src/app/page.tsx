@@ -3,14 +3,13 @@ import Link from "next/link";
 import { getCourses } from "@/lib/data";
 import { SUPABASE_CONFIGURED } from "@/lib/env";
 import CourseCard from "@/components/CourseCard";
-import { SUBJECT_META, CheckIcon } from "@/components/icons";
+import { CheckIcon } from "@/components/icons";
 import { PLANS, priceBreakdown } from "@/lib/plans";
 import HeroVisual from "@/components/HeroVisual";
 
 export default async function HomePage() {
   const courses = await getCourses();
   const popular = courses.slice(0, 3);
-  const subjects = Object.keys(SUBJECT_META);
 
   const feats = [
     ["Live classes", "Interactive live sessions with teachers, plus weekly doubt-solving."],
@@ -45,26 +44,6 @@ export default async function HomePage() {
           </div>
           <div className="visual">
             <HeroVisual />
-          </div>
-        </div>
-      </section>
-
-      <section className="sec">
-        <div className="wrap">
-          <div className="sec-head"><span className="eyebrow">By subject</span><h2>Focused prep for every subject.</h2><p>Mathematics, Science, Social Science and English — mapped to the full JKBOSE Class 8–10 syllabus.</p></div>
-          <div className="tiles">
-            {subjects.map((s) => {
-              const m = SUBJECT_META[s];
-              return (
-                <Link key={s} className="subj" href={`/courses?subject=${s}`}>
-                  <div className="ic" style={{ background: `linear-gradient(135deg, ${m.c}, ${m.c2})` }}>
-                    <svg viewBox="0 0 24 24" fill="none" width={24} height={24}>{m.path}</svg>
-                  </div>
-                  <h3>{s}</h3>
-                  <p>Live + recorded lessons, notes and tests.</p>
-                </Link>
-              );
-            })}
           </div>
         </div>
       </section>

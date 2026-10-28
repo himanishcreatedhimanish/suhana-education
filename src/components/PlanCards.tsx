@@ -18,7 +18,7 @@ function Cross({ size = 17 }: { size?: number }) {
 }
 
 export default function PlanCards() {
-  const [cls, setCls] = useState<Record<string, number>>({ base: 9, rise: 9, elite: 9 });
+  const [cls, setCls] = useState<number>(9);
   const [busy, setBusy] = useState<string | null>(null);
 
   function loadRazorpay(): Promise<void> {
@@ -32,7 +32,7 @@ export default function PlanCards() {
   }
 
   async function choose(plan: Plan) {
-    const selectedClass = cls[plan.id];
+    const selectedClass = cls;
     // require login in live mode
     if (SUPABASE_CONFIGURED) {
       const supabase = createClient()!;
@@ -86,6 +86,14 @@ export default function PlanCards() {
 
   return (
     <>
+      <div className="cls-switch">
+        <span className="cls-switch-label">Choose your class</span>
+        <div className="cls-switch-pick">
+          {PLAN_CLASSES.map((c) => (
+            <button key={c} className={"cls-switch-pill" + (cls === c ? " on" : "")} onClick={() => setCls(c)}>Class {c}</button>
+          ))}
+        </div>
+      </div>
       <div className="plans">
         {PLANS.map((plan) => {
           const { price, gst, total } = priceBreakdown(plan.price);
@@ -96,15 +104,7 @@ export default function PlanCards() {
               <div className="ptag">{plan.tagline}</div>
               <div className="pprice"><b>₹{price.toLocaleString("en-IN")}</b><span className="gst">+ GST</span></div>
               <div className="pbreak">₹{gst.toLocaleString("en-IN")} GST · ₹{total.toLocaleString("en-IN")} total · per year</div>
-
-              <div>
-                <div className="mut" style={{ fontSize: ".78rem", fontWeight: 600, marginBottom: 7 }}>Select class</div>
-                <div className="cls-pick">
-                  {PLAN_CLASSES.map((c) => (
-                    <button key={c} className={"pill" + (cls[plan.id] === c ? " on" : "")} onClick={() => setCls({ ...cls, [plan.id]: c })}>{c}th</button>
-                  ))}
-                </div>
-              </div>
+              <div className="pclass-tag">For Class {cls}</div>
 
               <ul>
                 {ALL_FEATURES.map((f) => {
