@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { setDemoUser } from "@/lib/clientState";
-import { SUPABASE_CONFIGURED, SITE_URL } from "@/lib/env";
+import { SUPABASE_CONFIGURED } from "@/lib/env";
 import { toast } from "@/components/toast";
 import { InfoIcon } from "@/components/icons";
 
@@ -78,7 +78,7 @@ export default function LoginForm() {
     // Try sign in, fall back to sign up.
     let { error } = await supabase!.auth.signInWithPassword({ email, password });
     if (error) {
-      const res = await supabase!.auth.signUp({ email, password, options: { emailRedirectTo: `${SITE_URL}/auth/callback?next=/onboarding` } });
+      const res = await supabase!.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding` } });
       error = res.error;
       if (!error) { setBusy(false); return toast("Check your email to confirm, then log in."); }
     }
@@ -94,7 +94,7 @@ export default function LoginForm() {
     }
     await supabase!.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${SITE_URL}/auth/callback?next=${encodeURIComponent("/onboarding")}` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/onboarding")}` },
     });
   }
 
