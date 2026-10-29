@@ -22,8 +22,8 @@ export default function Footer() {
           <div className="fcol">
             <h4>Platform</h4>
             <Link href="/dashboard">Student dashboard</Link>
-            <Link href="/teacher">Teacher console</Link>
-            <Link href="/admin">Admin console</Link>
+            <Link href="/login">Student portal</Link>
+            <Link href="/onboarding">Get started</Link>
           </div>
           <div className="fcol">
             <h4>Support</h4>

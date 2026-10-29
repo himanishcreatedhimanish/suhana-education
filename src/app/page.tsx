@@ -5,6 +5,7 @@ import { CheckIcon } from "@/components/icons";
 import { PLANS, priceBreakdown } from "@/lib/plans";
 import HeroVisual from "@/components/HeroVisual";
 import AuthCta from "@/components/AuthCta";
+import WelcomePopup from "@/components/WelcomePopup";
 
 export default async function HomePage() {
   const steps = [
@@ -30,6 +31,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <WelcomePopup />
       {!SUPABASE_CONFIGURED && (
         <div className="wrap" style={{ paddingTop: 16 }}>
           <div className="notice">

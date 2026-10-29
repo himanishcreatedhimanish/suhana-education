@@ -13,9 +13,10 @@ export interface LocalState {
   attempts: AttemptResult[];
   notifications: { body: string; at: number }[];
   subscription?: { planId: string; planName: string; class: number; at: number } | null;
+  downloads?: string[]; // `${courseId}/${lectureId}` saved for offline
 }
 
-const empty: LocalState = { enrolled: [], progress: {}, attempts: [], notifications: [], subscription: null };
+const empty: LocalState = { enrolled: [], progress: {}, attempts: [], notifications: [], subscription: null, downloads: [] };
 
 export function getState(): LocalState {
   if (typeof window === "undefined") return empty;
@@ -44,4 +45,19 @@ export function setDemoUser(u: Partial<Profile> | null) {
     if (u) localStorage.setItem(UKEY, JSON.stringify(u));
     else localStorage.removeItem(UKEY);
   } catch {}
+}
+
+// --- Downloaded lectures (demo mode). Key format: `${courseId}/${lectureId}`.
+export function isDownloaded(courseId: string, lectureId: string): boolean {
+  const s = getState();
+  return (s.downloads ?? []).includes(courseId + "/" + lectureId);
+}
+export function toggleDownload(courseId: string, lectureId: string): boolean {
+  const s = getState();
+  const key = courseId + "/" + lectureId;
+  const list = s.downloads ?? [];
+  const has = list.includes(key);
+  s.downloads = has ? list.filter((k) => k !== key) : [...list, key];
+  setState(s);
+  return !has; // true if now downloaded
 }

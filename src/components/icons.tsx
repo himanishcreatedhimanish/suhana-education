@@ -54,6 +54,9 @@ export const BellIcon = I(
   </>
 );
 export const ChartIcon = I(<path d="M3 3v18h18M7 14l4-4 3 3 5-6" />);
+export const DownloadIcon = I(<><path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" /></>);
+export const CheckCircleIcon = I(<><circle cx="12" cy="12" r="9" /><path d="m8.5 12 2.5 2.5 4.5-5" /></>);
+export const SearchIcon = I(<><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></>);
 
 // Subjects for J&K State Board (JKBOSE), Classes 8–10.
 export const SUBJECT_META: Record<string, { c: string; c2: string; path: ReactNode }> = {
