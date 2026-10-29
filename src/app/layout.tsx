@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AuthMarker from "@/components/AuthMarker";
 
 export const metadata: Metadata = {
   title: "Suhana Education — JKBOSE Class 8–10",
@@ -22,11 +23,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var t=localStorage.getItem('suhana-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}",
+              "try{var t=localStorage.getItem('suhana-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}try{var u=localStorage.getItem('suhana.user.v1');if(u){var j=JSON.parse(u);if(j&&j.full_name)document.documentElement.setAttribute('data-authed','yes');}}catch(e){}",
           }}
         />
       </head>
       <body>
+        <AuthMarker />
         <Navbar />
         <main>{children}</main>
         <Footer />

@@ -44,6 +44,10 @@ export function setDemoUser(u: Partial<Profile> | null) {
   try {
     if (u) localStorage.setItem(UKEY, JSON.stringify(u));
     else localStorage.removeItem(UKEY);
+    if (typeof document !== "undefined") {
+      if (u && u.full_name) document.documentElement.setAttribute("data-authed", "yes");
+      else document.documentElement.removeAttribute("data-authed");
+    }
   } catch {}
 }
 

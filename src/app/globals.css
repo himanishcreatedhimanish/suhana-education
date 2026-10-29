@@ -794,3 +794,6 @@ footer{background:var(--navy);color:var(--on-navy);padding-block:clamp(44px,6vw,
   .cx-learning{grid-template-columns:1fr}
   .cx-subjects{grid-template-columns:1fr}
 }
+
+/* Hide sign-up / account-funnel sections for logged-in students */
+:root[data-authed="yes"] .guest-only{display:none !important}

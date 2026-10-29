@@ -63,7 +63,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="sec sec-soft">
+      <section className="sec sec-soft guest-only">
         <div className="wrap">
           <div className="sec-head"><span className="eyebrow">How it works</span><h2>Start learning in three simple steps.</h2><p>From sign-up to your first lesson in minutes — no complicated setup.</p></div>
           <div className="steps">
@@ -84,7 +84,7 @@ export default async function HomePage() {
 
       <section className="sec">
         <div className="wrap">
-          <div className="sec-head"><span className="eyebrow">Why Suhana</span><h2>Everything prep needs, in one place.</h2></div>
+          <div className="sec-head"><span className="eyebrow">Why us</span><h2>Everything prep needs, in one place.</h2></div>
           <div className="tiles">
             {feats.map((f) => (
               <div key={f[0]} className="card feat-c">
@@ -123,7 +123,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="sec">
+      <section className="sec guest-only">
         <div className="wrap">
           <div style={{ background: "var(--primary)", color: "#fff", borderRadius: 20, padding: "clamp(28px,5vw,52px)", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 24, boxShadow: "var(--shadow-lg)", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", right: -80, bottom: -80, width: 320, height: 320, borderRadius: "50%", background: "rgba(255,255,255,.08)", pointerEvents: "none" }} />

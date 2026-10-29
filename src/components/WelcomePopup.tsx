@@ -4,6 +4,9 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import { PLANS, priceBreakdown } from "@/lib/plans";
 import { CheckIcon } from "@/components/icons";
+import { createClient } from "@/lib/supabase/client";
+import { getDemoUser } from "@/lib/clientState";
+import { SUPABASE_CONFIGURED } from "@/lib/env";
 
 // First-load "JOIN NOW" welcome popup for the public homepage.
 // Shows the three plans with pricing and a CTA. Appears once per browser
@@ -23,8 +26,18 @@ export default function WelcomePopup() {
     let seen = false;
     try { seen = sessionStorage.getItem(SEEN_KEY) === "1"; } catch {}
     if (seen) return;
-    const t = setTimeout(() => setOpen(true), 700);
-    return () => clearTimeout(t);
+    let cancelled = false;
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const showSoon = () => { if (!cancelled) t = setTimeout(() => setOpen(true), 700); };
+    // Only greet logged-out visitors — never show the join/sign-up popup to a student.
+    if (SUPABASE_CONFIGURED) {
+      const supabase = createClient();
+      supabase?.auth.getUser().then(({ data }) => { if (!data.user) showSoon(); });
+    } else {
+      const u = getDemoUser();
+      if (!(u && u.full_name)) showSoon();
+    }
+    return () => { cancelled = true; if (t) clearTimeout(t); };
   }, []);
 
   useEffect(() => {
