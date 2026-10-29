@@ -19,6 +19,40 @@ export async function getCourses(): Promise<Course[]> {
   return courses.map((c) => ({ ...c, chapters: [] })) as Course[];
 }
 
+// Courses WITH chapters & lectures, for the discovery/explorer page.
+// Demo mode returns the full seed; Supabase mode assembles outlines so
+// subject cards show accurate chapter/lecture counts and live schedules.
+export async function getCoursesDetailed(): Promise<Course[]> {
+  const supabase = await createClient();
+  if (!supabase) return demoCourses;
+  const { data: courses } = await supabase
+    .from("courses")
+    .select("id,title,class,exam,subject,type,teacher_name,price,mrp,description")
+    .eq("published", true)
+    .order("created_at", { ascending: true });
+  if (!courses || !courses.length) return [];
+  const courseIds = courses.map((c: any) => c.id);
+  const { data: chapters } = await supabase
+    .from("chapters")
+    .select("id,title,position,course_id")
+    .in("course_id", courseIds)
+    .order("position", { ascending: true });
+  const chIds = (chapters ?? []).map((c: any) => c.id);
+  const { data: lectures } = chIds.length
+    ? await supabase
+        .from("lectures")
+        .select("id,title,type,duration_min,description,scheduled_at,position,chapter_id")
+        .in("chapter_id", chIds)
+        .order("position", { ascending: true })
+    : { data: [] as any[] };
+  return courses.map((c: any) => ({
+    ...c,
+    chapters: (chapters ?? [])
+      .filter((ch: any) => ch.course_id === c.id)
+      .map((ch: any) => ({ ...ch, lectures: (lectures ?? []).filter((l: any) => l.chapter_id === ch.id) })),
+  })) as Course[];
+}
+
 export async function getCourse(id: string): Promise<Course | null> {
   const supabase = await createClient();
   if (!supabase) return demoCourse(id);

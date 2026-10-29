@@ -14,10 +14,11 @@ export default function PlansPage({ searchParams }: { searchParams: { class?: st
   const initialClass = [8, 9, 10].includes(c) ? c : 9;
   return (
     <div className="wrap page">
-      <div className="sec-head" style={{ marginTop: 10 }}>
+      <div className="crumbs"><Link href="/">Home</Link> › Plans &amp; pricing</div>
+      <div className="sec-head" style={{ marginTop: 6 }}>
         <span className="eyebrow">Plans &amp; pricing</span>
-        <h2>Complete learning support for Class 8, 9 &amp; 10.</h2>
-        <p>Pick the plan that fits you. Every plan covers live classes, study material, doubt-solving and fortnightly online exams — with health and career support on higher tiers.</p>
+        <h2>Choose your subscription — Base, Rise or Elite.</h2>
+        <p>One annual subscription covers everything for your class. Select your class, compare what each plan includes, and enrol securely. Looking for lessons instead? <Link href="/courses" style={{ color: "var(--primary)", fontWeight: 600 }}>Explore courses →</Link></p>
       </div>
 
       <PlanCards initialClass={initialClass} />
@@ -43,7 +44,7 @@ export default function PlansPage({ searchParams }: { searchParams: { class?: st
       </div>
 
       <div style={{ textAlign: "center", marginTop: 32 }}>
-        <Link className="btn ghost" href="/courses"><BookIcon size={16} /> Browse course content</Link>
+        <Link className="btn ghost" href="/courses"><BookIcon size={16} /> Explore course content</Link>
       </div>
     </div>
   );
