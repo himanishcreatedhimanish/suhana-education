@@ -55,6 +55,7 @@ export const BellIcon = I(
 );
 export const ChartIcon = I(<path d="M3 3v18h18M7 14l4-4 3 3 5-6" />);
 export const DownloadIcon = I(<><path d="M12 3v12" /><path d="m7 10 5 5 5-5" /><path d="M5 21h14" /></>);
+export const ReceiptIcon = I(<><path d="M5 3v18l2-1.5L9 21l2-1.5L13 21l2-1.5L17 21l2-1.5V3l-2 1.5L15 3l-2 1.5L11 3 9 4.5 7 3Z" /><path d="M8 8h8M8 12h8M8 16h5" /></>);
 export const CheckCircleIcon = I(<><circle cx="12" cy="12" r="9" /><path d="m8.5 12 2.5 2.5 4.5-5" /></>);
 export const SearchIcon = I(<><circle cx="11" cy="11" r="7" /><path d="m20 20-3.2-3.2" /></>);
 

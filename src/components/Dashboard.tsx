@@ -6,9 +6,10 @@ import { createClient } from "@/lib/supabase/client";
 import { getState, setState, getDemoUser, isDownloaded, toggleDownload } from "@/lib/clientState";
 import { SUPABASE_CONFIGURED } from "@/lib/env";
 import { SUBJECTS } from "@/lib/seed";
+import { planById, priceBreakdown } from "@/lib/plans";
 import {
   BookIcon, ChartIcon, LiveIcon, BellIcon, CheckIcon, PlayIcon, ClockIcon, InfoIcon,
-  DownloadIcon, SUBJECT_META,
+  DownloadIcon, ReceiptIcon, SUBJECT_META,
 } from "@/components/icons";
 import LecturePlayer, { PlayerLecture } from "@/components/LecturePlayer";
 
@@ -26,6 +27,7 @@ interface VM {
   attempts: { id: string; title: string; score: number; max: number; correct: number; wrong: number; at: number }[];
   notifications: { body: string; at: number }[];
   plan: { name: string; cls: number } | null;
+  orders: { id: string; item: string; kind: "plan" | "course"; amount: number; status: string; at: number; ref?: string | null }[];
 }
 
 function studentIdFrom(raw: string): string {
@@ -104,6 +106,8 @@ export default function Dashboard({ demoCourses, demoTests }: { demoCourses: Cou
         const { data: att } = await supabase.from("attempts").select("id,score,max_score,correct,wrong,submitted_at,tests(title)").eq("user_id", user.id).order("submitted_at", { ascending: false });
         const { data: notif } = await supabase.from("notifications").select("body,created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(20);
         const { data: sub } = await supabase.from("subscriptions").select("plan_name,class").eq("user_id", user.id).eq("status", "active").order("created_at", { ascending: false }).limit(1).maybeSingle();
+        const { data: ord } = await supabase.from("orders").select("id,amount,status,created_at,plan_id,course_id,razorpay_payment_id,courses(title)").eq("user_id", user.id).order("created_at", { ascending: false });
+        const supaOrders = (ord ?? []).map((o: any) => ({ id: o.id, kind: (o.plan_id ? "plan" : "course") as "plan" | "course", item: o.plan_id ? (planById(o.plan_id)?.name ?? "Plan") : (o.courses?.title ?? "Course"), amount: o.amount, status: o.status, at: new Date(o.created_at).getTime(), ref: o.razorpay_payment_id }));
 
         // done keys use courseId/lectureId; map via lectures list.
         const progIds = new Set((prog ?? []).map((p: any) => p.lecture_id));
@@ -124,6 +128,7 @@ export default function Dashboard({ demoCourses, demoTests }: { demoCourses: Cou
           attempts: (att ?? []).map((a: any) => ({ id: a.id, title: a.tests?.title ?? "Test", score: a.score, max: a.max_score, correct: a.correct, wrong: a.wrong, at: new Date(a.submitted_at).getTime() })),
           notifications: (notif ?? []).map((n: any) => ({ body: n.body, at: new Date(n.created_at).getTime() })),
           plan: sub ? { name: (sub as any).plan_name, cls: (sub as any).class } : null,
+          orders: supaOrders,
         });
       } else {
         const u = getDemoUser();
@@ -146,6 +151,10 @@ export default function Dashboard({ demoCourses, demoTests }: { demoCourses: Cou
           return { id: c.id, title: c.title, pct: t ? Math.round((dn / t) * 100) : 0 };
         });
         const upcoming = lectures.filter((l) => l.type === "live" && l.scheduled_at);
+        const subPlan = s.subscription ? planById(s.subscription.planId) : null;
+        const demoOrders = s.subscription
+          ? [{ id: "demo-" + s.subscription.at, kind: "plan" as const, item: s.subscription.planName, amount: subPlan ? priceBreakdown(subPlan.price).total * 100 : 0, status: "paid", at: s.subscription.at, ref: "DEMO" }]
+          : [];
         setVm({
           name: u.full_name!, cls: cls ?? "", exam: u.target_exam ?? "JKBOSE",
           studentId: studentIdFrom((u.full_name || "demo") + (u.class ?? "")),
@@ -154,6 +163,7 @@ export default function Dashboard({ demoCourses, demoTests }: { demoCourses: Cou
           attempts: s.attempts.slice().reverse().map((a) => ({ id: a.id, title: a.title, score: a.score, max: a.max_score, correct: a.correct, wrong: a.wrong, at: new Date(a.submitted_at).getTime() })),
           notifications: s.notifications.slice(0, 20),
           plan: s.subscription ? { name: s.subscription.planName, cls: s.subscription.class } : null,
+          orders: demoOrders,
         });
       }
     })();
@@ -219,6 +229,7 @@ export default function Dashboard({ demoCourses, demoTests }: { demoCourses: Cou
       ["doubt", "Doubt Solving", <InfoIcon size={17} key="db" />, false],
     ] },
     { group: "Account", items: [
+      ["purchases", "Purchases", <ReceiptIcon size={17} key="pu" />, true],
       ["notif", "Notifications", <BellIcon size={17} key="nt" />, true],
       ["profile", "Profile", <InfoIcon size={17} key="pr" />, true],
     ] },
@@ -474,6 +485,60 @@ export default function Dashboard({ demoCourses, demoTests }: { demoCourses: Cou
                 ))}</div>
               </>
             ) : <div className="card" style={{ textAlign: "center" }}><p className="mut">Your course progress will appear here as you watch lectures. Start from Recorded lectures above.</p><button className="btn" style={{ marginTop: 14 }} onClick={() => setTab("recorded")}>Browse recorded lectures</button></div>
+          )}
+          {tab === "purchases" && (
+            <>
+              <div className="hub-sec-h"><h2><ReceiptIcon size={18} />Purchases &amp; payments</h2></div>
+
+              {vm.plan ? (
+                <div className="card ds-plan" style={{ marginBottom: 20 }}>
+                  <div>
+                    <span className="badge ok"><CheckIcon size={13} /> Active subscription</span>
+                    <div style={{ fontFamily: "Plus Jakarta Sans,sans-serif", fontWeight: 800, fontSize: "1.2rem", marginTop: 6 }}>{vm.plan.name} · Class {vm.plan.cls}</div>
+                    <div className="mut" style={{ fontSize: ".84rem", marginTop: 3 }}>You have access to all your Class {vm.plan.cls} content. When a live class starts for your courses, join it from <button className="linklike" onClick={() => setTab("live")}>Live Classes</button>.</div>
+                  </div>
+                  <Link className="btn sm ghost" href="/plans">Manage plan</Link>
+                </div>
+              ) : (
+                <div className="card" style={{ marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+                  <div><b>No subscription yet.</b><div className="mut" style={{ fontSize: ".86rem" }}>Subscribe to unlock live classes, recorded lectures and study material.</div></div>
+                  <Link className="btn sm" href="/plans">View plans</Link>
+                </div>
+              )}
+
+              <h3 style={{ margin: "6px 0 12px" }}>Your courses</h3>
+              {vm.enrolled.length ? (
+                <div className="grid two" style={{ marginBottom: 26 }}>
+                  {vm.enrolled.map((c) => (
+                    <div className="card" key={c.id} style={{ display: "flex", alignItems: "center", gap: 13 }}>
+                      <div className="ic" style={{ width: 40, height: 40, borderRadius: 10, background: "var(--primary-soft)", color: "var(--primary)", display: "grid", placeItems: "center", flex: "none" }}><BookIcon size={18} /></div>
+                      <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: ".95rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.title}</div><div className="mut" style={{ fontSize: ".78rem" }}>{c.pct}% complete</div></div>
+                      <Link className="btn sm" href={`/courses/${c.id}`}>Open</Link>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="card" style={{ textAlign: "center", marginBottom: 26 }}><p className="mut">No individual course purchases yet. {vm.plan ? "Your subscription already covers your class content above." : "Subscribe to a plan or enroll in a course to see it here."}</p></div>
+              )}
+
+              <h3 style={{ margin: "6px 0 12px" }}>Payment history</h3>
+              {vm.orders.length ? (
+                <div className="tbl-wrap"><table>
+                  <thead><tr><th>Date</th><th>Item</th><th>Amount</th><th>Status</th><th>Reference</th></tr></thead>
+                  <tbody>{vm.orders.map((o) => (
+                    <tr key={o.id}>
+                      <td>{new Date(o.at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</td>
+                      <td><b>{o.item}</b><div className="mut" style={{ fontSize: ".74rem" }}>{o.kind === "plan" ? "Subscription" : "Course"}</div></td>
+                      <td className="tnum">₹{(o.amount / 100).toLocaleString("en-IN")}</td>
+                      <td><span className={"badge" + (o.status === "paid" ? " ok" : "")}>{o.status === "paid" ? "Paid" : o.status}</span></td>
+                      <td className="mut" style={{ fontSize: ".78rem" }}>{o.ref || "—"}</td>
+                    </tr>
+                  ))}</tbody>
+                </table></div>
+              ) : (
+                <div className="card" style={{ textAlign: "center" }}><p className="mut">No payments yet. When you subscribe or buy a course, the receipt appears here with amount, date and payment reference.</p></div>
+              )}
+            </>
           )}
           {tab === "notif" && (
             <div className="card">
