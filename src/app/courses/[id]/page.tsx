@@ -5,8 +5,9 @@ import CourseDetail from "@/components/CourseDetail";
 
 export const dynamic = "force-dynamic";
 
-export default async function CoursePage({ params }: { params: { id: string } }) {
-  const course = await getCourse(params.id);
+export default async function CoursePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const course = await getCourse(id);
   if (!course) notFound();
 
   let userId: string | null = null;

@@ -7,16 +7,17 @@ import { createClient } from "@/lib/supabase/client";
 import { getState, getDemoUser } from "@/lib/clientState";
 import { SUPABASE_CONFIGURED } from "@/lib/env";
 import { PLAN_CLASSES } from "@/lib/plans";
-import { SUBJECT_META, PlayIcon, LiveIcon, ClockIcon, CheckIcon, BookIcon } from "@/components/icons";
+import { BookIcon, SubjectGlyph, subjectClass } from "@/components/icons";
 
 const SUBJECT_BLURB: Record<string, string> = {
-  Mathematics: "Build strong fundamentals with step-by-step lessons and plenty of practice.",
-  Science: "Physics, Chemistry and Biology explained with clear diagrams and examples.",
-  "Social Science": "History, Geography, Civics and Economics made simple and memorable.",
+  Mathematics: "Strong fundamentals through step-by-step lessons and plenty of practice.",
+  Science: "Physics, chemistry and biology explained with clear diagrams and examples.",
+  "Social Science": "History, geography, civics and economics, made simple and memorable.",
   English: "Grammar, writing skills, prose and poetry for confident communication.",
 };
 const TYPES = ["Live", "Recorded", "Test Series"];
 const key = (courseId: string, lectureId: string) => courseId + "/" + lectureId;
+const when = (iso: string) => new Date(iso).toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
 export default function CoursesExplorer({ courses, initialClass }: { courses: Course[]; initialClass: number }) {
   const [cls, setCls] = useState<number>(initialClass);
@@ -102,48 +103,46 @@ export default function CoursesExplorer({ courses, initialClass }: { courses: Co
   const catalog = classCourses.filter((c) => !typeFilter || c.type === typeFilter);
 
   return (
-    <div className="wrap page cx">
-      <div className="crumbs"><Link href="/">Home</Link> › Courses</div>
+    <div className="wrap page">
+      <nav className="crumbs" aria-label="Breadcrumb"><Link href="/">Home</Link><span className="sep" aria-hidden />Courses</nav>
 
-      {/* hero */}
-      <section className="cx-hero">
-        <span className="eyebrow">Courses</span>
-        <h1>What do you want to learn <span className="grad">today?</span></h1>
-        <p className="cx-lead">Pick your class and dive into JKBOSE subjects — live classes, recorded lectures and chapter-wise practice, all in one place.</p>
-        <div className="cx-classpick" role="tablist" aria-label="Select your class">
-          <span className="cx-classpick-label">I'm in</span>
+      <div className="page-head">
+        <div>
+          <h1>Courses for Class {cls}</h1>
+          <p>JKBOSE subjects taught chapter by chapter, with live classes, recorded lectures and practice. Choose your class to see what’s inside.</p>
+        </div>
+        <div className="seg" role="group" aria-label="Choose your class">
           {PLAN_CLASSES.map((c) => (
-            <button key={c} role="tab" aria-selected={cls === c} className={"cx-class" + (cls === c ? " on" : "")} onClick={() => setCls(c)}>Class {c}</button>
+            <button key={c} type="button" aria-pressed={cls === c} onClick={() => setCls(c)}>Class {c}</button>
           ))}
         </div>
-      </section>
+      </div>
 
-      {/* learning dashboard strip */}
       {ready && (authed ? (
         (continueList.length > 0 || upcomingLive.length > 0) && (
-          <section className="cx-learning">
+          <section className="cx-learning" aria-label="Your learning">
             {continueList.length > 0 && (
-              <div className="cx-panel">
-                <div className="cx-panel-h"><h3><PlayIcon size={17} />Continue learning</h3><Link className="mini-btn" href="/dashboard">Dashboard</Link></div>
-                <div className="cx-continue">
+              <div className="panel cx-panel">
+                <div className="cx-panel-h"><h3>Continue learning</h3><Link className="mini-btn" href="/dashboard">Open dashboard</Link></div>
+                <div>
                   {continueList.map((c) => (
-                    <Link key={c.id} href={`/courses/${c.id}`} className="cx-continue-row">
-                      <span className="cx-cic" style={gradStyle(c.subject)}><svg viewBox="0 0 24 24" width={18} height={18}>{(SUBJECT_META[c.subject] ?? SUBJECT_META.Mathematics).path}</svg></span>
-                      <span className="cx-continue-main"><span className="cx-continue-title">{c.title}</span><span className="progress"><i style={{ width: c.pct + "%" }} /></span></span>
-                      <span className="mut tnum" style={{ fontSize: ".8rem" }}>{c.pct}%</span>
+                    <Link key={c.id} href={`/courses/${c.id}`} className={"row-link " + subjectClass(c.subject)}>
+                      <span className="sub-chip"><SubjectGlyph subject={c.subject} size={18} /></span>
+                      <span className="rl-main"><span className="rl-title">{c.title}</span><span className="progress"><i style={{ width: c.pct + "%" }} /></span></span>
+                      <span className="mut" style={{ fontSize: ".8125rem", minWidth: 36, textAlign: "right" }}>{c.pct}%</span>
                     </Link>
                   ))}
                 </div>
               </div>
             )}
             {upcomingLive.length > 0 && (
-              <div className="cx-panel">
-                <div className="cx-panel-h"><h3><LiveIcon size={17} />Upcoming live classes</h3></div>
-                <div className="cx-live-list">
+              <div className="panel cx-panel">
+                <div className="cx-panel-h"><h3>Upcoming live classes</h3></div>
+                <div>
                   {upcomingLive.map((l) => (
-                    <Link key={l.courseId + l.id} href={`/courses/${l.courseId}`} className="cx-live-row">
-                      <span className="cx-live-dot" />
-                      <span className="cx-live-main"><span className="cx-live-title">{l.title}</span><span className="cx-live-when">{l.subject} · {new Date(l.when).toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</span></span>
+                    <Link key={l.courseId + l.id} href={`/courses/${l.courseId}`} className="row-link">
+                      <span className="dot-live" aria-hidden />
+                      <span className="rl-main" style={{ gap: 2 }}><span className="rl-title">{l.title}</span><span className="rl-sub">{l.subject}, {when(l.when)}</span></span>
                     </Link>
                   ))}
                 </div>
@@ -152,77 +151,80 @@ export default function CoursesExplorer({ courses, initialClass }: { courses: Co
           </section>
         )
       ) : (
-        <section className="cx-cta">
-          <div><b>Log in to track your progress.</b><p className="mut">Sign in to resume lectures, join your live classes and see your completion — or keep exploring the subjects below.</p></div>
-          <Link className="btn" href="/login">Log in / Sign up</Link>
+        <section className="cx-signin">
+          <p><b>Log in to pick up where you left off.</b> Resume lectures, join your live classes and see your progress.</p>
+          <Link className="btn sm" href="/login">Log in or sign up</Link>
         </section>
       ))}
 
-      {/* subjects for selected class */}
-      <section className="cx-sec">
-        <div className="sec-head" style={{ textAlign: "left", margin: "0 0 18px" }}>
-          <h2 style={{ fontSize: "1.5rem" }}>Subjects for Class {cls}</h2>
-          <p style={{ marginTop: 6 }}>Explore each subject chapter by chapter. JKBOSE 2026–27 syllabus.</p>
+      <section className="cx-sec" aria-labelledby="cx-subj-h">
+        <div className="cx-sec-h">
+          <div>
+            <h2 id="cx-subj-h">Subjects</h2>
+            <p>JKBOSE 2026–27 syllabus for Class {cls}.</p>
+          </div>
         </div>
         {subjects.length ? (
           <div className="cx-subjects">
-            {subjects.map((s) => {
-              const meta = SUBJECT_META[s.subject] ?? SUBJECT_META.Mathematics;
-              return (
-                <div className="cx-subject" key={s.subject}>
-                  <div className="cx-subject-top">
-                    <span className="cx-subject-ic" style={gradStyle(s.subject)}><svg viewBox="0 0 24 24" width={24} height={24}>{meta.path}</svg></span>
-                    {s.liveCount > 0 && <span className="badge live" style={{ marginLeft: "auto" }}>Live</span>}
-                  </div>
+            {subjects.map((s) => (
+              <Link className={"subject-cover cover " + subjectClass(s.subject)} key={s.subject} href={s.href}>
+                <div>
+                  {s.liveCount > 0 && <span className="badge night" style={{ marginBottom: 14 }}>Includes live classes</span>}
                   <h3>{s.subject}</h3>
-                  <p className="cx-subject-desc">{SUBJECT_BLURB[s.subject] ?? "Chapter-wise lessons and practice for your board exam."}</p>
-                  <div className="cx-subject-meta">
-                    <span><BookIcon size={14} />{s.chapters} chapter{s.chapters !== 1 ? "s" : ""}</span>
-                    <span><PlayIcon size={14} />{s.lectures} lecture{s.lectures !== 1 ? "s" : ""}</span>
-                  </div>
+                  <p>{SUBJECT_BLURB[s.subject] ?? "Chapter-wise lessons and practice for your board exam."}</p>
                   {authed && s.done > 0 && (
-                    <div className="cx-subject-prog"><span className="progress"><i style={{ width: s.pct + "%" }} /></span><span className="mut tnum" style={{ fontSize: ".76rem" }}>{s.pct}%</span></div>
+                    <div className="sc-prog"><span className="progress"><i style={{ width: s.pct + "%" }} /></span><span>{s.pct}% done</span></div>
                   )}
-                  <Link className="btn block sm" href={s.href}>{authed && s.done > 0 ? "Continue learning" : "Explore subject"} →</Link>
                 </div>
-              );
-            })}
+                <div className="sc-foot">
+                  <span className="sc-stats">
+                    <span>{s.chapters} chapter{s.chapters !== 1 ? "s" : ""}</span>
+                    <span>{s.lectures} lecture{s.lectures !== 1 ? "s" : ""}</span>
+                  </span>
+                  <span className="sc-glyph"><SubjectGlyph subject={s.subject} /></span>
+                </div>
+              </Link>
+            ))}
           </div>
         ) : (
-          <div className="card" style={{ textAlign: "center" }}><p className="mut">Content for Class {cls} is being added. Try another class above, or <Link href="/plans" style={{ color: "var(--primary)", fontWeight: 600 }}>view plans</Link>.</p></div>
+          <div className="empty">
+            <h3>Class {cls} content is on its way</h3>
+            <p>Lessons for this class are being added. Choose another class above, or look at the plans to see what’s included.</p>
+            <Link className="btn ghost" href="/plans">View plans</Link>
+          </div>
         )}
       </section>
 
-      {/* browse all courses with content-type filter */}
       {classCourses.length > 0 && (
-        <section className="cx-sec">
-          <div className="cx-browse-h">
-            <h2 style={{ fontSize: "1.3rem" }}>Browse all Class {cls} courses</h2>
-            <div className="cx-typefilter">
-              <button className={"pill" + (typeFilter === "" ? " on" : "")} onClick={() => setTypeFilter("")}>All</button>
+        <section className="cx-sec" aria-labelledby="cx-all-h">
+          <div className="cx-sec-h">
+            <div>
+              <h2 id="cx-all-h">All Class {cls} courses</h2>
+              <p>{catalog.length} course{catalog.length !== 1 ? "s" : ""}{typeFilter ? `, ${typeFilter.toLowerCase()}` : ""}</p>
+            </div>
+            <div className="chips" role="group" aria-label="Filter by type">
+              <button className={"pill" + (typeFilter === "" ? " on" : "")} aria-pressed={typeFilter === ""} onClick={() => setTypeFilter("")}>All</button>
               {TYPES.map((t) => (
-                <button key={t} className={"pill" + (typeFilter === t ? " on" : "")} onClick={() => setTypeFilter(t)}>{t}</button>
+                <button key={t} className={"pill" + (typeFilter === t ? " on" : "")} aria-pressed={typeFilter === t} onClick={() => setTypeFilter(t)}>{t}</button>
               ))}
             </div>
           </div>
           {catalog.length ? (
             <div className="grid">{catalog.map((c) => <CourseCard key={c.id} course={c} />)}</div>
           ) : (
-            <div className="card" style={{ textAlign: "center" }}><p className="mut">No {typeFilter} courses for Class {cls}. <button className="linklike" onClick={() => setTypeFilter("")}>Show all</button></p></div>
+            <div className="empty">
+              <p>There are no {typeFilter.toLowerCase()} courses for Class {cls} yet.</p>
+              <button className="btn ghost" onClick={() => setTypeFilter("")}>Show all courses</button>
+            </div>
           )}
         </section>
       )}
 
-      {/* soft pointer to plans (not pricing cards) */}
-      <section className="cx-plans-note">
-        <div><b>Ready to enrol?</b><span className="mut"> Compare Base, Rise and Elite plans and subscribe for Class {cls}.</span></div>
-        <Link className="btn ghost" href={`/plans?class=${cls}`}>View plans &amp; pricing →</Link>
+      <section className="cx-plans">
+        <p><b>Ready to enroll?</b> One plan covers every Class {cls} subject for the year.</p>
+        <Link className="btn ghost" href={`/plans?class=${cls}`}><BookIcon size={18} />Compare Class {cls} plans</Link>
       </section>
     </div>
   );
 }
 
-function gradStyle(subject: string) {
-  const m = SUBJECT_META[subject] ?? SUBJECT_META.Mathematics;
-  return { background: `linear-gradient(135deg, ${m.c}, ${m.c2})`, color: "#fff" } as const;
-}

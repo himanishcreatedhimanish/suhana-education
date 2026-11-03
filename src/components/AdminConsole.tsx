@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { SUPABASE_CONFIGURED } from "@/lib/env";
 import * as store from "@/lib/adminStore";
 import { toast } from "@/components/toast";
-import { InfoIcon } from "@/components/icons";
+import { InfoIcon, XIcon } from "@/components/icons";
 
 const SUBJECTS = ["Mathematics", "Science", "Social Science", "English"];
 const EXAMS = ["JKBOSE"];
@@ -96,7 +96,7 @@ export default function AdminConsole({ role }: { role: "teacher" | "admin" }) {
           <Select label="Subject" opts={SUBJECTS} value={draft.subject} onChange={(v) => (draft.subject = v)} />
           <Select label="Type" opts={TYPES} value={draft.type} onChange={(v) => (draft.type = v)} />
         </div>
-        <Field label="Teacher (editable placeholder)" defaultValue={draft.teacher_name} onChange={(v) => (draft.teacher_name = v)} />
+        <Field label="Teacher name" defaultValue={draft.teacher_name} onChange={(v) => (draft.teacher_name = v)} />
         <div className="form-row">
           <Field label="Price (₹, 0 = free)" type="number" defaultValue={String(draft.price)} onChange={(v) => (draft.price = Number(v) || 0)} />
           <Field label="MRP (₹)" type="number" defaultValue={String(draft.mrp)} onChange={(v) => (draft.mrp = Number(v) || 0)} />
@@ -122,9 +122,9 @@ export default function AdminConsole({ role }: { role: "teacher" | "admin" }) {
         </div>
         <div className="form-row">
           <Field label="Duration (min)" type="number" defaultValue={String(draft.duration_min)} onChange={(v) => (draft.duration_min = Number(v) || 30)} />
-          <Field label="Marks correct" type="number" defaultValue={String(draft.marks_correct)} onChange={(v) => (draft.marks_correct = Number(v) || 4)} />
+          <Field label="Marks for a correct answer" type="number" defaultValue={String(draft.marks_correct)} onChange={(v) => (draft.marks_correct = Number(v) || 4)} />
         </div>
-        <Field label="Marks wrong (negative)" type="number" defaultValue={String(draft.marks_wrong)} onChange={(v) => (draft.marks_wrong = Number(v) || 0)} />
+        <Field label="Marks for a wrong answer (negative)" type="number" defaultValue={String(draft.marks_wrong)} onChange={(v) => (draft.marks_wrong = Number(v) || 0)} />
         <button className="btn block" onClick={() => {
           if (!draft.title?.trim()) return toast("Title required");
           saveTest({ title: draft.title.trim(), exam: draft.exam, class: draft.class, duration_min: draft.duration_min, marks_correct: draft.marks_correct, marks_wrong: draft.marks_wrong }, existing?.id);
@@ -152,7 +152,7 @@ export default function AdminConsole({ role }: { role: "teacher" | "admin" }) {
     );
   }
 
-  if (loading) return <div className="wrap page"><div className="card">Loading console…</div></div>;
+  if (loading) return <div className="wrap page" aria-busy="true"><p className="mut">Loading console…</p></div>;
 
   const items = role === "admin"
     ? [["courses", "Courses"], ["tests", "Tests & questions"], ["students", "Students"], ["analytics", "Analytics"]]
@@ -160,30 +160,33 @@ export default function AdminConsole({ role }: { role: "teacher" | "admin" }) {
 
   return (
     <div className="wrap page">
-      <div className="page-head">
-        <div><div className="eyebrow">{role === "admin" ? "Admin console" : "Teacher console"}</div><h1>Manage {role === "admin" ? "the platform" : "your teaching"}</h1><p>Create, edit and delete content.</p></div>
+      <div className="dash-head">
+        <div>
+          <h1>{role === "admin" ? "Admin console" : "Teacher console"}</h1>
+          <p style={{ color: "var(--ink-2)", marginTop: 8 }}>{role === "admin" ? "Manage courses, tests, questions and students." : "Manage your courses, tests and questions."}</p>
+        </div>
       </div>
-      <div className="notice" style={{ marginBottom: 20 }}>
+      <div className={"notice" + (SUPABASE_CONFIGURED ? " info" : "")} style={{ marginBottom: 28 }}>
         <InfoIcon size={18} />
         <div>{SUPABASE_CONFIGURED ? "Writes go to your Supabase database (RLS restricts this to teacher/admin accounts)." : "Demo mode: edits persist locally in this browser only and don't affect the server-rendered public pages. Configure Supabase for shared, persistent CRUD."}</div>
       </div>
       <div className="dash">
-        <nav className="dnav">
+        <nav className="dnav" aria-label="Console sections">
           {items.map(([id, label]) => (
-            <button key={id} className={tab === id ? "on" : ""} onClick={() => setTab(id as any)}>{label}</button>
+            <button key={id} className={tab === id ? "on" : ""} aria-current={tab === id ? "page" : undefined} onClick={() => setTab(id as any)}>{label}</button>
           ))}
         </nav>
-        <div>
+        <div className="ds-main">
           {tab === "courses" && (
             <>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <h3>Courses ({courses.length})</h3>
-                <button className="btn sm" onClick={() => courseForm()}>+ New course</button>
+              <div className="hub-sec-h">
+                <h2>Courses <span className="mut" style={{ fontWeight: 500 }}>{courses.length}</span></h2>
+                <button className="btn sm" onClick={() => courseForm()}>New course</button>
               </div>
               <div className="tbl-wrap"><table>
-                <thead><tr><th>Title</th><th>Class</th><th>Exam</th><th>Subject</th><th>Type</th><th>Teacher</th><th>Price</th><th></th></tr></thead>
+                <thead><tr><th>Title</th><th>Class</th><th>Board</th><th>Subject</th><th>Type</th><th>Teacher</th><th>Price</th><th><span className="sr-only">Actions</span></th></tr></thead>
                 <tbody>{courses.map((c) => (
-                  <tr key={c.id}><td><b>{c.title}</b></td><td>{c.class}</td><td>{c.exam}</td><td>{c.subject}</td><td>{c.type}</td><td>{c.teacher_name}</td><td>{c.price > 0 ? "₹" + c.price : "Free"}</td>
+                  <tr key={c.id}><td><b style={{ fontWeight: 600 }}>{c.title}</b></td><td>{c.class}</td><td>{c.exam}</td><td>{c.subject}</td><td>{c.type}</td><td>{c.teacher_name}</td><td>{c.price > 0 ? "₹" + c.price.toLocaleString("en-IN") : "Free"}</td>
                     <td><div className="rowact"><button className="mini-btn" onClick={() => courseForm(c)}>Edit</button><button className="mini-btn del" onClick={() => deleteCourse(c.id)}>Delete</button></div></td>
                   </tr>
                 ))}</tbody>
@@ -192,15 +195,15 @@ export default function AdminConsole({ role }: { role: "teacher" | "admin" }) {
           )}
           {tab === "tests" && (
             <>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <h3>Tests ({tests.length})</h3>
-                <button className="btn sm" onClick={() => testForm()}>+ New test</button>
+              <div className="hub-sec-h">
+                <h2>Tests <span className="mut" style={{ fontWeight: 500 }}>{tests.length}</span></h2>
+                <button className="btn sm" onClick={() => testForm()}>New test</button>
               </div>
               <div className="tbl-wrap"><table>
-                <thead><tr><th>Title</th><th>Exam</th><th>Class</th><th>Duration</th><th>Questions</th><th></th></tr></thead>
+                <thead><tr><th>Title</th><th>Board</th><th>Class</th><th>Duration</th><th>Questions</th><th><span className="sr-only">Actions</span></th></tr></thead>
                 <tbody>{tests.map((t) => (
-                  <tr key={t.id}><td><b>{t.title}</b></td><td>{t.exam}</td><td>{t.class}</td><td>{t.duration_min} min</td><td>{t.questions.length || "—"}</td>
-                    <td><div className="rowact"><button className="mini-btn" onClick={() => testForm(t)}>Edit</button><button className="mini-btn" onClick={() => addQuestion(t)}>+ Question</button><button className="mini-btn del" onClick={() => deleteTest(t.id)}>Delete</button></div></td>
+                  <tr key={t.id}><td><b style={{ fontWeight: 600 }}>{t.title}</b></td><td>{t.exam}</td><td>{t.class}</td><td>{t.duration_min} min</td><td>{t.questions.length || "None yet"}</td>
+                    <td><div className="rowact"><button className="mini-btn" onClick={() => testForm(t)}>Edit</button><button className="mini-btn" onClick={() => addQuestion(t)}>Add question</button><button className="mini-btn del" onClick={() => deleteTest(t.id)}>Delete</button></div></td>
                   </tr>
                 ))}</tbody>
               </table></div>
@@ -208,12 +211,12 @@ export default function AdminConsole({ role }: { role: "teacher" | "admin" }) {
           )}
           {tab === "students" && role === "admin" && (
             <>
-              <h3 style={{ marginBottom: 16 }}>Students ({students.length})</h3>
+              <div className="hub-sec-h"><h2>Students <span className="mut" style={{ fontWeight: 500 }}>{students.length}</span></h2></div>
               <div className="tbl-wrap"><table>
-                <thead><tr><th>Name</th><th>Class</th><th>Exam</th></tr></thead>
+                <thead><tr><th>Name</th><th>Class</th><th>Board</th></tr></thead>
                 <tbody>{students.length ? students.map((s) => (
-                  <tr key={s.id}><td><b>{s.name}</b></td><td>{s.cls || "—"}</td><td>{s.exam}</td></tr>
-                )) : <tr><td colSpan={3} className="mut">No students yet.</td></tr>}</tbody>
+                  <tr key={s.id}><td><b style={{ fontWeight: 600 }}>{s.name}</b></td><td>{s.cls ? `Class ${s.cls}` : "Not set"}</td><td>{s.exam}</td></tr>
+                )) : <tr><td colSpan={3} className="mut">No students have signed up yet.</td></tr>}</tbody>
               </table></div>
             </>
           )}
@@ -235,9 +238,10 @@ export default function AdminConsole({ role }: { role: "teacher" | "admin" }) {
 // ---- small form primitives ----
 function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
   return (
-    <div className="modal-bg" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="modal-bg" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal">
-        <h3 style={{ marginBottom: 16 }}>{title}</h3>
+        <button className="icon-btn modal-x" onClick={onClose} aria-label="Close"><XIcon size={20} /></button>
+        <h3 style={{ marginBottom: 18, paddingRight: 40 }}>{title}</h3>
         {children}
       </div>
     </div>
