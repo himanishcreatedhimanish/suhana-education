@@ -78,7 +78,8 @@ export default function Navbar() {
     <header className="nav">
       <div className="wrap nav-in">
         <Link className="brand" href="/" aria-label="Suhana Education home">
-          <img src="/suhana-logo.png" alt="Suhana Education" className="brand-logo" width={109} height={30} />
+          <img src="/suhana-logo.png" alt="Suhana Education" className="brand-logo on-light" width={142} height={36} />
+          <img src="/suhana-logo-light.png" alt="" aria-hidden className="brand-logo on-dark" width={142} height={36} />
         </Link>
         <nav className="nav-links" aria-label="Primary">
           {links.map(([href, label]) => (

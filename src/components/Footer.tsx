@@ -6,10 +6,9 @@ export default function Footer() {
       <div className="wrap">
         <div className="foot-top">
           <div className="foot-brand">
-            <img src="/suhana-icon.png" alt="" className="brand-mark" width={41} height={40} />
+            <img src="/suhana-logo-light.png" alt="Suhana Education" className="foot-logo" width={189} height={48} />
             <div>
-              <div className="foot-name">Suhana Education</div>
-              <p style={{ marginTop: 8 }}>
+              <p>
                 Live classes, recorded lectures, study material and fortnightly exams for J&amp;K State Board
                 students in Classes 8, 9 and 10.
               </p>
