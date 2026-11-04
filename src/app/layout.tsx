@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,19 +7,24 @@ import AuthMarker from "@/components/AuthMarker";
 export const metadata: Metadata = {
   title: "Suhana Education — JKBOSE Class 8–10",
   description:
-    "Live classes, recorded lectures and test series for J&K State Board (JKBOSE), Classes 8–10.",
+    "Live classes, recorded lectures, study material and fortnightly exams for J&K State Board (JKBOSE) Classes 8, 9 and 10.",
+  icons: { icon: "/suhana-icon.png", apple: "/suhana-icon.png" },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1226" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
+        <link rel="preload" href="/fonts/schibsted-grotesk-latin-wght-normal.woff2" as="font" type="font/woff2" crossOrigin="" />
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -30,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <AuthMarker />
         <Navbar />
-        <main>{children}</main>
+        <main id="main">{children}</main>
         <Footer />
         <div id="toast" role="status" aria-live="polite" />
       </body>

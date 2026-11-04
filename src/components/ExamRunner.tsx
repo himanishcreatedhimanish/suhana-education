@@ -5,6 +5,7 @@ import type { Test } from "@/lib/types";
 import { getState, setState } from "@/lib/clientState";
 import { SUPABASE_CONFIGURED } from "@/lib/env";
 import { toast } from "@/components/toast";
+import { ClockIcon } from "@/components/icons";
 
 type Answer = number | number[] | string;
 
@@ -118,69 +119,82 @@ export default function ExamRunner({ test }: { test: Test }) {
   return (
     <div className="exam">
       <div className="exam-top">
-        <div className="nm">{test.title}<small>{q.subject} · Question {cur + 1} of {test.questions.length}</small></div>
-        <div className={"timer" + (remaining <= 60 ? " low" : "")}>{fmt(remaining)}</div>
+        <div className="nm">{test.title}<small>Question {cur + 1} of {test.questions.length}, {q.subject}</small></div>
+        <div className={"timer" + (remaining <= 60 ? " low" : "")} role="timer" aria-label="Time remaining"><ClockIcon size={18} />{fmt(remaining)}</div>
+      </div>
+
+      <div className="palette-strip" aria-label="Questions">
+        {test.questions.map((qq, i) => (
+          <button key={qq.id} className={"pbtn" + (isAnswered(qq.id) ? " answered" : "") + (review[qq.id] ? " review" : "") + (i === cur ? " cur" : "")} onClick={() => setCur(i)} aria-label={`Question ${i + 1}`}>{i + 1}</button>
+        ))}
       </div>
 
       <div className="exam-body">
         <div className="q-area">
-          <div className="qh">
-            <span className="qnum">Q{cur + 1}</span>
-            <span className="badge">{q.subject}</span>
-            <span className="q-marks">+{test.marks_correct} · {test.marks_wrong} · {q.type === "multi" ? "Multiple correct" : q.type === "numeric" ? "Numerical" : "Single correct"}</span>
-          </div>
-          <div className="q-text">{q.text}</div>
+          <div className="q-inner">
+            <div className="qh">
+              <span className="qnum">Question {cur + 1}</span>
+              <span className="badge">{q.subject}</span>
+              <span className="q-marks">{q.type === "multi" ? "More than one correct" : q.type === "numeric" ? "Numerical answer" : "One correct answer"}, +{test.marks_correct} / {test.marks_wrong}</span>
+            </div>
+            <div className="q-text">{q.text}</div>
 
-          {q.type === "numeric" ? (
-            <input className="input num-in" inputMode="decimal" placeholder="Type your answer" value={(answers[q.id] as string) ?? ""} onChange={(e) => setNumeric(e.target.value)} />
-          ) : (
-            (q.options ?? []).map((o, i) => {
-              const sel = q.type === "multi" ? Array.isArray(answers[q.id]) && (answers[q.id] as number[]).includes(i) : answers[q.id] === i;
-              return (
-                <div key={i} className={"opt" + (q.type === "multi" ? " multi" : "") + (sel ? " sel" : "")} onClick={() => select(i)}>
-                  <span className="mk">{sel ? (q.type === "multi" ? "✓" : "") : String.fromCharCode(65 + i)}</span>
-                  <span>{o}</span>
-                </div>
-              );
-            })
-          )}
+            {q.type === "numeric" ? (
+              <input className="input num-in" inputMode="decimal" placeholder="Type your answer" aria-label="Your answer" value={(answers[q.id] as string) ?? ""} onChange={(e) => setNumeric(e.target.value)} />
+            ) : (
+              <div role={q.type === "multi" ? "group" : "radiogroup"} aria-label="Options">
+                {(q.options ?? []).map((o, i) => {
+                  const sel = q.type === "multi" ? Array.isArray(answers[q.id]) && (answers[q.id] as number[]).includes(i) : answers[q.id] === i;
+                  return (
+                    <div key={i} role={q.type === "multi" ? "checkbox" : "radio"} aria-checked={sel} tabIndex={0}
+                      className={"opt" + (q.type === "multi" ? " multi" : "") + (sel ? " sel" : "")}
+                      onClick={() => select(i)} onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); select(i); } }}>
+                      <span className="mk">{sel && q.type === "multi" ? "✓" : String.fromCharCode(65 + i)}</span>
+                      <span>{o}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
-        <aside className="palette-wrap">
-          <h4>Question palette</h4>
+        <aside className="palette-wrap" aria-label="Question palette">
+          <h4>Questions</h4>
           <div className="palette">
             {test.questions.map((qq, i) => (
-              <button key={qq.id} className={"pbtn" + (isAnswered(qq.id) ? " answered" : "") + (review[qq.id] ? " review" : "") + (i === cur ? " cur" : "")} onClick={() => setCur(i)}>{i + 1}</button>
+              <button key={qq.id} className={"pbtn" + (isAnswered(qq.id) ? " answered" : "") + (review[qq.id] ? " review" : "") + (i === cur ? " cur" : "")} onClick={() => setCur(i)} aria-label={`Question ${i + 1}`}>{i + 1}</button>
             ))}
           </div>
           <div className="legend">
-            <div className="lg"><span className="sw" style={{ background: "var(--ok)" }} />Answered ({answeredCount})</div>
-            <div className="lg"><span className="sw" style={{ background: "var(--review)" }} />Marked for review</div>
-            <div className="lg"><span className="sw" />Not visited</div>
+            <div className="lg"><span className="sw" style={{ background: "var(--ok)", borderColor: "var(--ok)" }} />Answered ({answeredCount})</div>
+            <div className="lg"><span className="sw" style={{ background: "var(--review)", borderColor: "var(--review)" }} />Marked for review</div>
+            <div className="lg"><span className="sw" />Not answered</div>
           </div>
-          <button className="btn danger block" style={{ marginTop: 18 }} onClick={() => setConfirming(true)}>Submit test</button>
+          <button className="btn danger block" style={{ marginTop: 20 }} onClick={() => setConfirming(true)}>Submit test</button>
         </aside>
       </div>
 
       <div className="exam-foot">
-        <button className="btn ghost sm" onClick={() => setCur((c) => Math.max(0, c - 1))}>Previous</button>
-        <button className="btn ghost sm" onClick={() => setAnswers((p) => { const n = { ...p }; delete n[q.id]; return n; })}>Clear response</button>
-        <button className="btn ghost sm" onClick={() => setReview((p) => ({ ...p, [q.id]: !p[q.id] }))}>{review[q.id] ? "Unmark review" : "Mark for review"}</button>
+        <button className="btn ghost sm" onClick={() => setCur((c) => Math.max(0, c - 1))} disabled={cur === 0}>Previous</button>
+        <button className="btn quiet sm" onClick={() => setAnswers((p) => { const n = { ...p }; delete n[q.id]; return n; })}>Clear</button>
+        <button className="btn quiet sm" onClick={() => setReview((p) => ({ ...p, [q.id]: !p[q.id] }))} aria-pressed={!!review[q.id]}>{review[q.id] ? "Unmark review" : "Mark for review"}</button>
         <span className="spacer" />
-        <button className="btn sm" onClick={() => setCur((c) => Math.min(test.questions.length - 1, c + 1))}>Save &amp; Next</button>
+        <button className="btn danger sm only-narrow" onClick={() => setConfirming(true)}>Submit</button>
+        <button className="btn sm" onClick={() => setCur((c) => Math.min(test.questions.length - 1, c + 1))} disabled={cur === test.questions.length - 1}>Save and next</button>
       </div>
 
       {confirming && (
-        <div className="modal-bg" onClick={(e) => { if (e.target === e.currentTarget) setConfirming(false); }}>
+        <div className="modal-bg" role="dialog" aria-modal="true" aria-labelledby="submit-h" onClick={(e) => { if (e.target === e.currentTarget) setConfirming(false); }}>
           <div className="modal">
-            <h3 style={{ marginBottom: 12 }}>Submit test?</h3>
-            <div className="kv"><span>Answered</span><b>{answeredCount} / {test.questions.length}</b></div>
+            <h3 id="submit-h" style={{ marginBottom: 14 }}>Submit your test?</h3>
+            <div className="kv"><span>Answered</span><b>{answeredCount} of {test.questions.length}</b></div>
             <div className="kv"><span>Not answered</span><b>{test.questions.length - answeredCount}</b></div>
-            <div className="kv"><span>Time left</span><b>{fmt(remaining)}</b></div>
-            <p className="mut" style={{ fontSize: ".86rem", margin: "14px 0" }}>Once submitted, your answers are scored and locked.</p>
+            <div className="kv"><span>Time left</span><b className="tnum">{fmt(remaining)}</b></div>
+            <p className="mut" style={{ fontSize: ".875rem", margin: "16px 0 20px" }}>After you submit, your answers are scored and can’t be changed.</p>
             <div style={{ display: "flex", gap: 10 }}>
-              <button className="btn ghost block" onClick={() => setConfirming(false)}>Keep attempting</button>
-              <button className="btn block" onClick={() => doSubmit(false)}>Submit now</button>
+              <button className="btn ghost block" onClick={() => setConfirming(false)}>Keep going</button>
+              <button className="btn block" onClick={() => doSubmit(false)}>Submit test</button>
             </div>
           </div>
         </div>

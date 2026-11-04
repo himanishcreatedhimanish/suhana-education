@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { setDemoUser } from "@/lib/clientState";
@@ -40,10 +40,10 @@ export default function LoginForm() {
 
   async function sendOtp() {
     const digits = phone.replace(/\D/g, "");
-    if (digits.length !== 10) return toast("Enter a valid 10-digit number");
+    if (digits.length !== 10) return toast("Enter your 10-digit mobile number");
     if (!SUPABASE_CONFIGURED) {
       setOtpSent(true);
-      toast("Demo OTP is 123456");
+      toast("Demo code: 123456");
       return;
     }
     setBusy(true);
@@ -51,12 +51,12 @@ export default function LoginForm() {
     setBusy(false);
     if (error) return toast(error.message);
     setOtpSent(true);
-    toast("OTP sent");
+    toast("Code sent to +91 " + digits);
   }
 
   async function verifyOtp() {
     if (!SUPABASE_CONFIGURED) {
-      if (otp !== "123456") return toast("Demo OTP is 123456");
+      if (otp !== "123456") return toast("That code isn’t right. The demo code is 123456.");
       setDemoUser({ full_name: "", onboarded: false });
       return router.push("/onboarding");
     }
@@ -68,8 +68,8 @@ export default function LoginForm() {
   }
 
   async function emailSignIn() {
-    if (!/.+@.+\..+/.test(email)) return toast("Enter a valid email");
-    if (password.length < 6) return toast("Password must be at least 6 characters");
+    if (!/.+@.+\..+/.test(email)) return toast("Enter a valid email address");
+    if (password.length < 6) return toast("Use a password of at least 6 characters");
     if (!SUPABASE_CONFIGURED) {
       setDemoUser({ full_name: "", onboarded: false });
       return router.push("/onboarding");
@@ -80,7 +80,7 @@ export default function LoginForm() {
     if (error) {
       const res = await supabase!.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding` } });
       error = res.error;
-      if (!error) { setBusy(false); return toast("Check your email to confirm, then log in."); }
+      if (!error) { setBusy(false); return toast("Check your inbox to confirm your email, then log in."); }
     }
     setBusy(false);
     if (error) return toast(error.message);
@@ -98,46 +98,65 @@ export default function LoginForm() {
     });
   }
 
+  const submit = (fn: () => unknown) => (e: FormEvent) => { e.preventDefault(); if (!busy) fn(); };
+
   return (
-    <div className="card">
+    <div className="auth-form">
+      <h1>Log in or create an account</h1>
+      <p className="sub">New to Suhana? Your account is created when you verify.</p>
+
       {!SUPABASE_CONFIGURED && (
-        <div className="notice" style={{ marginBottom: 18 }}>
+        <div className="notice" style={{ marginBottom: 20 }}>
           <InfoIcon size={18} />
-          <div><b>Demo mode.</b> Phone OTP and Google are simulated (OTP: <b>123456</b>). Configure Supabase Auth to enable real sign-in.</div>
+          <div><b>Demo mode.</b> Phone and Google sign-in are simulated. Use the code <b>123456</b>.</div>
         </div>
       )}
-      <h1 style={{ fontSize: "1.5rem", marginBottom: 4 }}>Log in or sign up</h1>
-      <p className="mut" style={{ marginBottom: 18 }}>Choose a method to continue.</p>
 
-      <div className="seg">
-        <button className={tab === "phone" ? "on" : ""} onClick={() => setTab("phone")}>Phone OTP</button>
-        <button className={tab === "email" ? "on" : ""} onClick={() => setTab("email")}>Email</button>
-      </div>
-
-      <button className="gbtn" onClick={google}>
-        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7C21.8 18.9 23 15.9 23 12.3z" /><path fill="#34A853" d="M12 24c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.4 1.1-3.9 1.1-3 0-5.6-2-6.5-4.8H1.7v3C3.6 21.3 7.5 24 12 24z" /><path fill="#FBBC05" d="M5.5 14.6a7.2 7.2 0 0 1 0-4.6v-3H1.7a12 12 0 0 0 0 10.6l3.8-3z" /><path fill="#EA4335" d="M12 4.8c1.7 0 3.2.6 4.4 1.7l3.3-3.3C17.7 1.2 15.1 0 12 0 7.5 0 3.6 2.7 1.7 6.6l3.8 3C6.4 6.8 9 4.8 12 4.8z" /></svg>
+      <button className="gbtn" type="button" onClick={google}>
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden><path fill="#4285F4" d="M23 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7C21.8 18.9 23 15.9 23 12.3z" /><path fill="#34A853" d="M12 24c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.4 1.1-3.9 1.1-3 0-5.6-2-6.5-4.8H1.7v3C3.6 21.3 7.5 24 12 24z" /><path fill="#FBBC05" d="M5.5 14.6a7.2 7.2 0 0 1 0-4.6v-3H1.7a12 12 0 0 0 0 10.6l3.8-3z" /><path fill="#EA4335" d="M12 4.8c1.7 0 3.2.6 4.4 1.7l3.3-3.3C17.7 1.2 15.1 0 12 0 7.5 0 3.6 2.7 1.7 6.6l3.8 3C6.4 6.8 9 4.8 12 4.8z" /></svg>
         Continue with Google
       </button>
       <div className="divider">or</div>
 
+      <div className="seg block" role="tablist" aria-label="Sign-in method" style={{ marginBottom: 20 }}>
+        <button type="button" role="tab" aria-selected={tab === "phone"} onClick={() => setTab("phone")}>Mobile number</button>
+        <button type="button" role="tab" aria-selected={tab === "email"} onClick={() => setTab("email")}>Email</button>
+      </div>
+
       {tab === "phone" ? (
         !otpSent ? (
-          <>
-            <div className="field"><label htmlFor="ph">Mobile number</label><input className="input" id="ph" type="tel" inputMode="numeric" maxLength={10} placeholder="10-digit mobile number" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
-            <button className="btn block" disabled={busy} onClick={sendOtp}>Send OTP</button>
-          </>
+          <form onSubmit={submit(sendOtp)} noValidate>
+            <div className="field">
+              <label htmlFor="ph">Mobile number</label>
+              <div className="input-prefix">
+                <span>+91</span>
+                <input className="input" id="ph" type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} placeholder="10-digit number" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              </div>
+              <p className="hint">We’ll text you a 6-digit code.</p>
+            </div>
+            <button className="btn lg block" type="submit" disabled={busy}>{busy ? "Sending code…" : "Send code"}</button>
+          </form>
         ) : (
-          <>
-            <div className="field"><label htmlFor="otp">Enter OTP</label><input className="input" id="otp" inputMode="numeric" maxLength={6} placeholder="6-digit code" value={otp} onChange={(e) => setOtp(e.target.value)} /></div>
-            <button className="btn block" disabled={busy} onClick={verifyOtp}>Verify &amp; continue</button>
-          </>
+          <form onSubmit={submit(verifyOtp)} noValidate>
+            <div className="otp-sent">
+              <span>Code sent to +91 {phone.replace(/\D/g, "")}</span>
+              <button type="button" className="linklike" onClick={() => { setOtpSent(false); setOtp(""); }}>Change</button>
+            </div>
+            <div className="field">
+              <label htmlFor="otp">Enter the 6-digit code</label>
+              <input className="input otp-input" id="otp" inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="••••••" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))} autoFocus />
+            </div>
+            <button className="btn lg block" type="submit" disabled={busy}>{busy ? "Verifying…" : "Verify and continue"}</button>
+            <p className="auth-fine">Didn’t get it? <button type="button" className="linklike" onClick={sendOtp} disabled={busy}>Send a new code</button></p>
+          </form>
         )
       ) : (
-        <>
-          <div className="field"><label htmlFor="em">Email</label><input className="input" id="em" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-          <div className="field"><label htmlFor="pw">Password</label><input className="input" id="pw" type="password" placeholder="At least 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
-          <button className="btn block" disabled={busy} onClick={emailSignIn}>Continue</button>
-        </>
+        <form onSubmit={submit(emailSignIn)} noValidate>
+          <div className="field"><label htmlFor="em">Email</label><input className="input" id="em" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+          <div className="field"><label htmlFor="pw">Password</label><input className="input" id="pw" type="password" autoComplete="current-password" placeholder="At least 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+          <button className="btn lg block" type="submit" disabled={busy}>{busy ? "Please wait…" : "Continue"}</button>
+          <p className="auth-fine">If you don’t have an account yet, we’ll create one and email you a confirmation link.</p>
+        </form>
       )}
       <input type="hidden" value={next} readOnly />
     </div>
