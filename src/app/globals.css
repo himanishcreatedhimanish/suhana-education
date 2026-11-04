@@ -50,7 +50,7 @@
   --btn-hover: #1a42c2;
   --on-btn: #ffffff;
 
-  --marigold: #f5b83d;
+  --marigold: #fbb829;
   --live: #dc3b3f;
   --live-50: #fdeced;
   --ok: #10805a;
@@ -352,9 +352,15 @@ textarea.input { height: auto; padding: 12px 14px; line-height: 1.5; resize: ver
 .nav { position: sticky; top: 0; z-index: 100; background: color-mix(in srgb, var(--paper) 86%, transparent); -webkit-backdrop-filter: saturate(1.6) blur(14px); backdrop-filter: saturate(1.6) blur(14px); border-bottom: 1px solid var(--line); }
 .nav-in { display: flex; align-items: center; gap: 28px; height: var(--nav-h); }
 .brand { display: inline-flex; align-items: center; flex: none; }
-.brand-logo { height: 30px; width: auto; }
+.brand-logo { height: 36px; width: auto; }
+.brand-logo.on-dark { display: none; }
+:root[data-theme="dark"] .brand-logo.on-light { display: none; }
+:root[data-theme="dark"] .brand-logo.on-dark { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .brand-logo.on-light { display: none; }
+  :root:not([data-theme]) .brand-logo.on-dark { display: block; }
+}
 .brand-mark { height: 32px; width: auto; border-radius: 8px; }
-:root[data-theme="dark"] .brand-logo { filter: brightness(1.45) saturate(.9); }
 .nav-links { display: flex; align-items: center; gap: 4px; height: 100%; }
 .nav-links a { position: relative; display: inline-flex; align-items: center; height: 100%; padding: 0 12px; font-size: .9375rem; font-weight: 500; color: var(--ink-2); transition: color .15s; }
 .nav-links a:hover { color: var(--ink); }
@@ -382,7 +388,7 @@ textarea.input { height: auto; padding: 12px 14px; line-height: 1.5; resize: ver
 .foot a:hover { color: #fff; }
 .foot-top { display: grid; grid-template-columns: minmax(0, 5fr) repeat(3, minmax(0, 2fr)); gap: 40px; position: relative; }
 .foot-brand { display: flex; flex-direction: column; gap: 18px; }
-.foot-brand .brand-mark { height: 40px; width: auto; align-self: flex-start; border-radius: 10px; }
+.foot-logo { height: 48px; width: auto; align-self: flex-start; }
 .foot-brand p { color: var(--on-night-2); max-width: 40ch; font-size: .9375rem; }
 .foot-name { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; color: #fff; }
 .foot-col h4 { color: #fff; font-size: .9375rem; margin-bottom: 14px; }
@@ -998,7 +1004,7 @@ tbody tr:hover { background: color-mix(in srgb, var(--mist) 60%, transparent); }
 }
 @media (max-width: 640px) {
   :root { --nav-h: 60px; }
-  .brand-logo { height: 26px; }
+  .brand-logo { height: 32px; }
   .hero-facts { grid-template-columns: 1fr; gap: 12px; }
   .hero-facts > div { display: flex; justify-content: space-between; gap: 16px; }
   .hero-facts dd { margin: 0; text-align: right; }
